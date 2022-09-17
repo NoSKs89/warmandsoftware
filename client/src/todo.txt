@@ -1,0 +1,15 @@
+create like a scrolling page portfolio.
+it explains full stack, with front end being heaven and back end (sql) being hell
+
+create the fortune teller origami based on useGesture and animation frame?
+
+create one of those little toys where you rotate the maze to make the balls fall in the hole
+
+gyroscope with device orientation controls would be cool.. it's in progress. currently it pulls the camera way off angle just when mounting.
+
+
+affirmations bingo
+
+
+connection string:
+mongodb://warmandsoftware-mongo:jKpTnU26ltzje9rImyqQkD4FS6rpF2s0nRKcpEnrslSLvfOOzc60JEZ0j4AHk6Qyq4EZAe7M2CLV3LiTgBa4EA==@warmandsoftware-mongo.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@warmandsoftware-mongo@

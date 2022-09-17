@@ -1,0 +1,15 @@
+  //clean this crap up!
+  let squarePositions = []
+  const generateGrid = (rows, columns) => {
+    let gridX = 0, gridY = 0
+    for(let i = 0; i < rows; i++){
+      gridY = i 
+      for(let z = 0; z < columns; z++){
+          gridX = z 
+          // squarePositions.push(`[${gridX},${gridY},0]`)
+          squarePositions.push([gridX, gridY, 0])
+        }
+      }
+    // console.log(squarePositions)
+  }
+  generateGrid(7,7)
