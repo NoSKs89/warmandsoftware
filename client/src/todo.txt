@@ -13,3 +13,5 @@ affirmations bingo
 
 connection string:
 mongodb://warmandsoftware-mongo:jKpTnU26ltzje9rImyqQkD4FS6rpF2s0nRKcpEnrslSLvfOOzc60JEZ0j4AHk6Qyq4EZAe7M2CLV3LiTgBa4EA==@warmandsoftware-mongo.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@warmandsoftware-mongo@
+
+test commit.
