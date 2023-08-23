@@ -27,6 +27,7 @@ import SVGCursor from './components/SVGCursor2'
 import DoublePoem from './components/DoublePoem'
 import InfoDiv from './components/InfoDiv'
 import AboutMe from './components/AboutMe'
+import ArtGallery from './components/PixiGallery'
 
 import GridCell from './components/GridCell'
 import data from './data'
@@ -68,7 +69,7 @@ export default function App() {
   const [doublePoemVisible, setDoublePoemVisible] = useState(activeComponents.includes('dblpoem'))
   const [infoDivVisible, setInfoDivVisible] = useState(false)
   const [infoDivText, setInfoDivText] = useState('Lorem Ipsum Lorem Ipsum Lorem Ipsum LUL')
-
+  const [artGalleryVisible, setArtGalleryVisible] = useState(false)
   const [activePoem, setActivePoem] = useState(Poems.length - 1)
 
   const [aboutMeVisible, setAboutMeVisible] = useState(false)
@@ -78,6 +79,7 @@ export default function App() {
   {text: "Toggle Pattern1", setVisible: setPattern1Visible, visible: pattern1Visible, type: "feature", infoText: 'A plane with a sine wave moving through it', infoTitle: 'Pattern 1'},
   // {text: "PAW PADS", setVisible: setSVGWalkerVisible, visible: svgWalkerVisible, type: "feature", infoText: 'SVG stamp animation. Initially I wanted to move page content with the paw direction to emphasize the movement.', infoTitle: 'SVGs in Motion'},
   {text: "Toggle Poems", setVisible: setPoem1Visible, visible: poem1Visible, type: "feature", infoText: 'A Series of poems.', infoTitle: 'Poetry', lastUpdated: '8/26/22'},
+  {text: "Toggle Art Gallery", setVisible: setArtGalleryVisible, visible: artGalleryVisible, type: "feature", infoText: 'Visual Art', infoTitle: 'Visual Arts', isNew: true},
   // {text: "About Me", setVisible: setAboutMeVisible, visible: aboutMeVisible, type: 'feature', infoText: 'About Me', infoTitle: 'About'}
   ]
 
@@ -103,7 +105,7 @@ export default function App() {
   let socialIconClass = bIsMobile ? "sidebarSocialMobile" : "sidebarSocial"
 
   if(!bIsMobile){
-    sidebarItemsArr.push({text: "DOUBLE Poem", setVisible: setDoublePoemVisible, visible: doublePoemVisible, type: "feature", infoText: 'A component where both my Love and I wrote a poem and put together a design. It follows the cursor in certain places and triggers animations on some positions.', infoTitle: 'A Joint Poem', isNew: true})
+    sidebarItemsArr.push({text: "DOUBLE Poem", setVisible: setDoublePoemVisible, visible: doublePoemVisible, type: "feature", infoText: 'A component where both my Love and I wrote a poem and put together a design. It follows the cursor in certain places and triggers animations on some positions.', infoTitle: 'A Joint Poem'})
     //sidebarItemsArr.push({text: "Cursor Draft", setVisible: setSVGCursorVisible, visible: svgCursorVisible, type: "feature", infoText: 'The concept is someone has a logo/banner where you click it and it becomes the cursor until you make a selection.', infoTitle: 'Moveable Header Demo'})
   }
   if(bIsMobile){
@@ -179,6 +181,7 @@ export default function App() {
       <pointLight position={[-10, -10, -10]} />
 
       {stealthRocksVisible ? <StealthRocksMesh width={1} /> : null} 
+      {artGalleryVisible ? <Suspense fallback={<Box />}><ArtGallery /></Suspense> : null}
 
       {/* <Fortune /> */}
       {poem1Visible ? <Poem poems={Poems} bIsMobile={bIsMobile} activePoem={activePoem} disableRepeatText={() => 

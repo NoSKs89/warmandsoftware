@@ -32,7 +32,7 @@ const ResponsiveText = (props) => {
       <Text
         key={props.poems.indexOf(poem)}
         color={poem.color ?? "#ADD8E6"}
-        fontSize={props.bIsMobile ? 0.2 : 0.2}
+        fontSize={poem.shrink ? 0.15 : (props.bIsMobile ? 0.2 : 0.2)}
         maxWidth={(viewport.width / 100) * 80}
         lineHeight={1.15}
         letterSpacing={-0.01}
