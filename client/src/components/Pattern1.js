@@ -10,7 +10,7 @@ const params = {
     wireframe: true,
     centerX: 0,
     centerY: 0,
-    startColor: new THREE.Color("#CAC5DC"),
+    startColor: new THREE.Color("red"),
     endColor: new THREE.Color("#F8DBEA"),
     fixedTime: 0,
     rotationSpeed: 0,
