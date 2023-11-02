@@ -89,6 +89,7 @@ function GalleryToggle(props) {
         opacity: [0, 1],
         height: ['0%', '35%'],
         transform: ['scaleY(1) scaleX(1)'],
+        zIndex: [11]
       }, { duration: 1, delay: 0 })
     }
     else{
@@ -97,8 +98,16 @@ function GalleryToggle(props) {
         animate('.galleryToggle', {
           bottom: ['-20%', '0%'],
           opacity: [0],
-          height: ['35%', '0%']
+          height: ['35%', '0%'],
         }, { duration: 0, delay: 0 })
+      }
+      else{
+        // animate('.galleryToggle', {
+        //   bottom: ['-20%', '0%'],
+        //   opacity: [0],
+        //   height: ['35%', '0%'],
+        //   zIndex: [11, 0]
+        // }, { duration: 1, delay: 0 })
       }
     }
   }, [props.ready])

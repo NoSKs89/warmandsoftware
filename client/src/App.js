@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { animated, SpringValue, useSpring, useChain, useTransition, useSpringRef } from "@react-spring/web"
 import { a, config, useSpring as canvasUseSpring } from '@react-spring/three'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import * as THREE from 'three'
 
 import MenuCanvasText from './components/MenuCanvasText'
 import SocialFollow from './components/SocialFollow'
@@ -111,6 +112,7 @@ export default function App() {
   const textContentRef = useSpringRef()
   const menuRef = useSpringRef()
   const bgColorRef = useSpringRef()
+  const sceneRef = useRef()
 
   //used to delay the art gallery load so it doesn't hiccup...//todo: make it NOT hiccup D:
   useEffect(() => {
@@ -383,7 +385,7 @@ export default function App() {
   return (
     <>
     <div style={{ width: '100%', height: '100%'}}>
-    <Canvas className='menuOptions' gl={{ antialias: true }} style={canvasStyles} camera={{ position: [0, 0, 5], far: 10000 }}>
+    <Canvas className='menuOptions' gl={{ antialias: false }} dpr={[1, 1.5]} style={canvasStyles} camera={{ position: [0, 0, 5] }}>
     {MenuItemArray.slice(1).map((menuitem, index) => (
       <MenuCanvasText
         index={index}
@@ -407,6 +409,7 @@ export default function App() {
           <GalleryContent showGallery={showGallery} />
         </Suspense> 
         : null}
+      {/* <fog attach="fog" args={['#17171b', 0, 5]} /> */}
     </Canvas></div>
     <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} />
     <div className='body' ref={scrollableContainerRef}>

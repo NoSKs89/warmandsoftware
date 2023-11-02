@@ -30,6 +30,7 @@
     line-height: 1;
     cursor: var(--cursorToUse);
     scroll-behavior: smooth !important;
+    background-color: black;
   }
 
   .body {

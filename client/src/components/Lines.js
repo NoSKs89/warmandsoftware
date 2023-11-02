@@ -54,7 +54,7 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
     }
     else{
       if (distanceFromCenter < lerpThresholdMax && distanceFromCenter > lerpThresholdMin && active)
-      speed *= 1.01
+        speed *= 1.01
       else if(!active && hovered)
         speed = 1.01
 
