@@ -350,18 +350,18 @@ export default function App() {
   }, [showBottomMenu, currentItem, currentIndex])
 
   // useEffect(() => console.log(JSON.stringify(thisItem)), [thisItem])
-  const [elipsesColor, setElipsesColor] = useState(thisItem.primaryColor)
+  const [ellipsesColor, setEllipsesColor] = useState(thisItem.primaryColor)
   useEffect(() => {
     setTimeout(() => {
-      setElipsesColor(thisItem.primaryColor)
+      setEllipsesColor(thisItem.primaryColor)
     }, 500)
   })
-  const Elipses = () => {
+  const Ellipses = () => {
     return (<div class="typing-notification">
               <div class="circle-container">
-                  <div style={{ '--bg-color': elipsesColor }} class="circle circle1"></div>
-                  <div style={{ '--bg-color': elipsesColor }} class="circle circle2"></div>
-                  <div style={{ '--bg-color': elipsesColor }} class="circle circle3"></div>
+                  <div style={{ '--bg-color': ellipsesColor }} class="circle circle1"></div>
+                  <div style={{ '--bg-color': ellipsesColor }} class="circle circle2"></div>
+                  <div style={{ '--bg-color': ellipsesColor }} class="circle circle3"></div>
               </div>
           </div>)
   }
@@ -438,9 +438,9 @@ export default function App() {
                         return null
                       }
                       return (
-                      <React.Fragment key={index}>
+                      <React.Fragment key={index}> 
                         <div>
-                        <section className={everyOther ? 'subContent' : 'subContent2'} onClick={textOnClick}><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><Elipses /></i></section>
+                        <section className={everyOther ? 'subContent' : 'subContent2'} onClick={textOnClick}><div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></section>
                         <section className='readContainer'>
                         {index < MenuItemArray[MenuItemArray.findIndex(item => item.name === lastItem)].textContent.split("\\n").length - 1 && <><TimeStickingComponent initialFormattedTime={formattedTime} everyOther={everyOther} /><br /></> }</section>
                         </div>
