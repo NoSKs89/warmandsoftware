@@ -534,7 +534,56 @@
     transform: scale(2) rotate(360deg);
     background: radial-gradient(180deg, var(--bg-color) 0%, black 100%); 
   }
-
-
-
+}
+.minHeight {
+  min-height: 35vh;
+}
+.imgStyle {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+  gap: 1rem; /* Adjust the gap as needed */
+  background-color: black !important;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-right: 4rem;
+  padding-right: 3rem;
+  pointer-events: none;
+  z-index: 8 !important;
+  min-height: 35vh;
+}
+.imgContainer {
+  width: 75% !important; 
+  height: 75% !important; 
+  position: relative;
+  z-index: 1;
+  border-radius: 50%;
+  left: 15%;
+  bottom: -10%;
+  border: black;
+  background-color: black;
+  border: 8px solid black;
+  opacity: 0;
+}
+/* .imgContainer {
+  width: 75% !important; 
+  height: 75% !important; 
+  position: relative;
+  z-index: 1;
+  border-radius: 50%;
+  left: 15%;
+  bottom: -10%;
+  border: black;
+  background-color: black;
+  border: 8px solid black;
+  opacity: 0;
+} */
+/* .aboutPhoto {
+  opacity: 0;
+} */
+.imgContainer img {
+  width: 100%;
+  border-radius: 50%;
+  height: 100%;
+  object-fit: cover; /* This will maintain the aspect ratio and cover the entire container */
+  opacity: 0;
 }

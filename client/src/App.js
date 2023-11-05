@@ -6,6 +6,7 @@ import { a, config, useSpring as canvasUseSpring } from '@react-spring/three'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
+import BabeAndI from './images/Photos/babeandi.jpg'
 import MenuCanvasText from './components/MenuCanvasText'
 import SocialFollow from './components/SocialFollow'
 import Lines from './components/Lines'
@@ -17,6 +18,7 @@ import GalleryContent from './components/GalleryContent'
 // const GalleryContent = lazy(() => import('./components/GalleryContent'))
 import DOMPoems from './components/PoemsDOM'
 import GlowingCanvas from './components/EffectCompositions/GlowingCanvas'
+import { ConsoleSqlOutlined } from '@ant-design/icons'
 
 const TimeStickingComponent = ({ initialFormattedTime, everyOther }) => {
   const [stickyTime, setStickyTime] = useState(initialFormattedTime)
@@ -28,7 +30,7 @@ const TimeStickingComponent = ({ initialFormattedTime, everyOther }) => {
 const ContentTextArray = [
   //about //we contain multitudes. //My favorite voice is the gentle applause of birch trees, their lanky bodies swaying as leaves catch the wind. 
   //The basis of perception, is participation. The creative interplay of our overlapping senses link us to an animate world. \\nWe must depart from our devices and heads and return to our senses -- in doing so realizing our connection with the living, dynamic world.
-  "Hi. I'm a Midwest-based software developer, artist, sound designer and eclectic. \\nI believe we should reclaim the terms 'amateur' and 'dilettante' from our consumerist society -- because interests and experiences that do not generate income are still enjoyable and valuable. \\nI enjoy hiking, reading, painting, writing, and making music. \\nMy favorite sounds are the fluttering of birch leaves and loon calls -- find them.\\n", //My patience is sparse for car and plane noise when I'm outdoors, Ask me about recording dolphins
+  "Hi. I'm a Midwest-based software developer, artist, sound designer and eclectic. \\nThis is me, with my fiance Brooke. <3 \\nI believe we should reclaim the terms 'amateur' and 'dilettante' from our consumerist society -- because interests and experiences that do not generate income are still enjoyable and valuable. \\nI enjoy hiking, reading, painting, writing, and making music. \\nMy favorite sounds are the fluttering of birch leaves and loon calls -- find them.\\n", //My patience is sparse for car and plane noise when I'm outdoors, Ask me about recording dolphins
   //art we are all travelers of a sensuous world.
   "Art is play, it is exploration, it is experimentation. It captures sensations, movements, emotions, in a given moment. \\nReaching through each person's filter, it affects their inner states, often unconsciously; thus, art can be incredibly therapeutic. \\nArt is inherently subjective; there is no standard for 'good' or 'bad' art, it either resonates in an individual or it does not. \\nFor me, it is a restless urge -- a drive to express myself every day.\\n",
   //poems
@@ -168,6 +170,7 @@ export default function App() {
   const leaveViewport = () => {}
 
 
+  const animationEasing = { easing: ["ease-in", "ease-out"] }
 
   const handleTransitionsComplete = () => {
     setFirstExplosionComplete(true)
@@ -176,31 +179,35 @@ export default function App() {
     setBResetSlowDown(false)
     let delayFirstSubcontent2 = true
     inView('section.subContent', (info) => {
-      animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75})
-      animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2})
-      animate(info.target, { boxShadow: "6px 9px 9px #000" }, { duration: 4, delay: 2.5 })
+      animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
+      animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing})
+      animate(info.target, { boxShadow: "6px 9px 9px #000" }, { duration: 4, delay: 2.5 , ...animationEasing})
       return leaveViewport
     }, { amount: "all", once: "true" }) 
     inView('section.subContent2', (info) => {
       if(delayFirstSubcontent2){
         setTimeout(() => {
-          animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2 })
-          animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75})
-          animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 4, delay: 1.5 })
+          animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
+          animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
+          animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 4, delay: 1.5, ...animationEasing })
+          if(currentItem === 'ABOUT'){
+            animate(info.target.querySelector('img'), { opacity: 1 }, { duration: 2, delay: 2, ...animationEasing })
+            animate('.imgContainer', { opacity: 1, borderColor: 'white'}, {duration: 2, delay: 2.5, ...animationEasing })
+          }
           delayFirstSubcontent2 = false
           return leaveViewport  
-        }, 3000)
+        }, 1500)
       }
       else {
-          animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2 })
-          animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75})
-          animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 4, delay: 1.5 })
+          animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
+          animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
+          animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 4, delay: 1.5, ...animationEasing })
+          animate(info.target.querySelector('img'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
           return leaveViewport  
       }
-      
     }, {  amount: "all", once: "true" })
     inView('section.readContainer', (info) => {
-      animate(info.target.querySelector('h4'), { opacity: 1 }, { duration: 1.5, delay: Math.floor(Math.random() * 3) + 3 })
+      animate(info.target.querySelector('h4'), { opacity: 1 }, { duration: 1.5, delay: Math.floor(Math.random() * 3) + 3, ...animationEasing })
       return leaveViewport
     }, {  amount: "all", once: "true" })
     if((currentItem === 'ART' || currentItem === 'POEMS') && !ArtGalleryOpen && !showGallery){
@@ -357,14 +364,29 @@ export default function App() {
     }, 500)
   })
   const Ellipses = () => {
-    return (<div class="typing-notification">
-              <div class="circle-container">
-                  <div style={{ '--bg-color': ellipsesColor }} class="circle circle1"></div>
-                  <div style={{ '--bg-color': ellipsesColor }} class="circle circle2"></div>
-                  <div style={{ '--bg-color': ellipsesColor }} class="circle circle3"></div>
+    return (<div className="typing-notification">
+              <div className="circle-container">
+                  <div style={{ '--bg-color': ellipsesColor }} className="circle circle1"></div>
+                  <div style={{ '--bg-color': ellipsesColor }} className="circle circle2"></div>
+                  <div style={{ '--bg-color': ellipsesColor }} className="circle circle3"></div>
               </div>
           </div>)
   }
+  let firstSubContent2 = true
+  const [renderImage, setRenderImage] = useState(currentItem === 'ABOUT' && firstSubContent2)
+  useEffect(() =>{ 
+    if(currentItem === 'ABOUT' && firstSubContent2){
+      if(lastItem === ''){
+        setRenderImage(true)
+      }
+      else {setTimeout(() => { setRenderImage(true)}, 600)} 
+    }  
+    else{
+      setTimeout(() => {
+        setRenderImage(false)
+      }, 600)
+    }
+  }, [currentItem])
   //todo. 
   //find sfx library. make / record my own. recording voice noises like 'phewwwww', 'cutcha' https://theshubhagrwl.medium.com/you-might-not-need-a-sound-library-for-react-a265870dabda
   //----every other text thing should make a shimmer and the final one loaded should be different
@@ -382,6 +404,7 @@ export default function App() {
   //I think the zindex is fading back automatically on first menu item click for lines still...
   //create a blinking arrow or something to guide users to the end of the scroll
   //https://css-tricks.com/snippets/svg/curved-text-along-path/ curve don't stare at the sun
+  //it would be cool to make the subContents springs as well so we could have them bounce on the transition
   return (
     <>
     <div style={{ width: '100%', height: '100%'}}>
@@ -437,10 +460,13 @@ export default function App() {
                         everyOther = false
                         return null
                       }
+                      if (renderImage) {
+                        firstSubContent2 = false
+                      }
                       return (
                       <React.Fragment key={index}> 
                         <div>
-                        <section className={everyOther ? 'subContent' : 'subContent2'} onClick={textOnClick}><div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></section>
+                        <section className={renderImage && index > 0 && index < 2 ? 'subContent2 imgStyle' : (everyOther ? 'subContent' : 'subContent2')} onClick={textOnClick}>{renderImage && index > 0 && index < 2 ? <div className='imgContainer'><img className='aboutPhoto' src={BabeAndI} alt="BabeAndI" /></div> : null}<div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></section>
                         <section className='readContainer'>
                         {index < MenuItemArray[MenuItemArray.findIndex(item => item.name === lastItem)].textContent.split("\\n").length - 1 && <><TimeStickingComponent initialFormattedTime={formattedTime} everyOther={everyOther} /><br /></> }</section>
                         </div>
@@ -454,11 +480,9 @@ export default function App() {
             </div>
           </section>
       </animated.div>
-      
     </div>
     {!delayBottomNavClose ? <GalleryRemakeBottom setArtGalleryOpen={setArtGalleryOpen} setCanvasZindex={setCanvasZindex} setShowGallery={setShowGallery} finishColor={thisItem.primaryColor} startColor={thisItem.secondaryColor} ready={bottomMenuReady ? true : false}/> : null}
     {currentItem === "POEMS" ? <DOMPoems setSinglePoemIsActive={setSinglePoemIsActive} showPoemMenu={showPoemMenu} primaryColor={thisItem.thirdColor} secondaryColor={thisItem.primaryColor} setCanvasZindex={setCanvasZindex} setBCanvasPointerEvents={setBCanvasPointerEvents} /> : null}
-    
     <SocialFollow />
     </>
   )

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { useRef, useState, useEffect, useLayoutEffect } from 'react'
+import { Group, ShaderMaterial } from 'three'
+import { useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Image, ScrollControls, Scroll, useScroll, Text, Text3D } from '@react-three/drei'
 import { proxy, useSnapshot } from 'valtio'
@@ -29,6 +30,35 @@ const state = proxy({
   clicked: null,
   urls: [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
 })
+
+const textVertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const textFragmentShader = `
+  varying vec2 vUv;
+  uniform vec3 colorA;
+  uniform vec3 colorB;
+  uniform float time;
+
+  void main() {
+    vec3 finalColor = mix(colorA, colorB, abs(sin(time)));
+    gl_FragColor = vec4(finalColor, 1.0);
+  }
+`
+// const customMaterial = new ShaderMaterial({
+//   uniforms: {
+//     colorA: { value: new THREE.Color(0xff0000) }, // Start color (red)
+//     colorB: { value: new THREE.Color(0x00ff00) }, // End color (green)
+//     time: { value: 0.0 }, // Time to control color transition
+//   },
+//   vertexShader: textVertexShader,
+//   fragmentShader: textFragmentShader,
+// })
 
 function Item({ index, position, scale, showGallery, onImgClick, c = new THREE.Color(), ...props }) {
   const ref = useRef()
@@ -118,53 +148,68 @@ function Item({ index, position, scale, showGallery, onImgClick, c = new THREE.C
 }
 
 const AText3D = (props) => {
+  const data = useMemo(
+    () => ({
+      uniforms: {
+        colorA: { value: new THREE.Color(0xff0000) }, // Start color (red)
+        colorB: { value: new THREE.Color(0x00ff00) }, // End color (green)
+        time: { value: 0.0 }, // Time to control color transition
+        Ka: { value: new THREE.Vector3(1, 1, 1) },
+        Kd: { value: new THREE.Vector3(1, 1, 1) },
+        Ks: { value: new THREE.Vector3(1, 1, 1) },
+        LightIntensity: { value: new THREE.Vector4(0.5, 0.5, 0.5, 1.0) },
+        LightPosition: { value: new THREE.Vector4(0.0, 2000.0, 0.0, 1.0) },
+        Shininess: { value: 200.0 }
+      },
+      textFragmentShader,
+      textVertexShader
+    }),
+    []
+  )
   const textRef = useRef()
+  const groupRef = useRef()
+  const materialRef = useRef()
   const scroll = useScroll()
   const averageCharacterWidth = 0.04
   const text = props.artTitle
   const estimatedWidth = text.length * averageCharacterWidth
-  useFrame(({mouse}, delta) => {
+  useFrame(({mouse, clock}, delta) => {
     const { x, y } = mouse
     // Calculate rotation angles based on the mouse position
-    const rotationX = ((0.5 - y) * Math.PI / 4) - (-estimatedWidth / 2)
-    const rotationY = ((x - 0.5) * Math.PI / 4) - (-estimatedWidth / 2)
+    const rotationX = ((0.5 - y) * Math.PI / 9) - (-estimatedWidth / 2)
+    const rotationY = ((x - 0.5) * Math.PI / 9) - (-estimatedWidth / 2)
 
     // Update the rotation of the text
-    textRef.current.rotation.x = damp(textRef.current.rotation.x, rotationX, 3, delta)
-    textRef.current.rotation.y = damp(textRef.current.rotation.y, rotationY, 3, delta)
+    // textRef.current.rotation.x = damp(textRef.current.rotation.x, rotationX, 3, delta)
+    // textRef.current.rotation.y = damp(textRef.current.rotation.y, rotationY, 3, delta)
     
     // The offset is between 0 and 1, you can apply it to your models any way you like
     const offset = scroll.offset
-    textRef.current.position.y = damp(textRef.current.position.y, offset, 3, delta)
+    // textRef.current.position.y = damp(textRef.current.position.y, offset, 3, delta)
+    // textRef.current.position.x = (-estimatedWidth / 2) + offset * 6.5
 
-    textRef.current.position.x = (-estimatedWidth / 2) + offset * 6.5
 
-    // Calculate the rotation based on the scroll offset
-    // const rotationY = (-1 + offset * 2) * Math.PI * (-estimatedWidth / 2)
-    // textRef.current.rotation.y = damp(textRef.current.rotation.y, rotationY, 6, delta)
-    // const lookDownPosition = 0.25
-    // const lookUpPosition = 0.75
-    // // Calculate the rotation on the X-axis based on scroll position
-    // let rotationX = 0 
-    // if (offset >= lookDownPosition && offset <= lookUpPosition) {
-    //   // Rotate from looking down to looking up
-    //   rotationX = (offset - lookDownPosition - 0.25) * Math.PI
-    // } else if (offset < lookDownPosition) {
-    //   // Rotate down
-    //   rotationX = (offset - lookDownPosition) * Math.PI 
-    // } else if (offset > lookUpPosition) {
-    //   // Rotate up
-    //   rotationX = (offset - lookUpPosition) * Math.PI
-    // }
-    // textRef.current.rotation.x = damp(textRef.current.rotation.x, rotationX, 6, delta)
-    // console.log(offset)
+    // Update the rotation of the group instead of the text
+    groupRef.current.rotation.x = damp(groupRef.current.rotation.x, rotationX, 4, delta);
+    groupRef.current.rotation.y = damp(groupRef.current.rotation.y, rotationY, 3, delta);
+
+    // Update the position of the group instead of the text
+    groupRef.current.position.y = damp(groupRef.current.position.y, offset - 0.5, 3, delta);
+    groupRef.current.position.x = (-estimatedWidth / 2) + offset * 6.5;
+
+    if (materialRef.current) {
+      materialRef.current.uniforms.time.value = Math.sin(clock.elapsedTime); // Update time based on elapsed time
+    }
   })
   
   return (
+    <group ref={groupRef}>
     <Text3D ref={textRef} font={bagelFatOne} letterSpacing={-0.01} size={0.15} position={[-0.5, 1, 3]} anchorX="center">
       {props.artTitle}
       <meshNormalMaterial />
-    </Text3D>
+      {/* <primitive object={textRef.current} material={customMaterial} /> */}
+      {/* <shaderMaterial attach="material" {...data} ref={materialRef} /> */}
+    </Text3D></group>
   )
 }
 
