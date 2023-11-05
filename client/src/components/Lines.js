@@ -38,7 +38,7 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
   let originalSpeed = speed
   useFrame(( { mouse }, delta) => {
     camera.updateProjectionMatrix()
-    const x = (mouse.x * viewport.width) / 2
+    let x = (mouse.x * viewport.width) / 2
     const y = (mouse.y * viewport.height) / 2
     const distanceFromCenter = Math.sqrt(x * x + y * y)
     const lerpThresholdMax = 0.95 * Math.min(viewport.width, viewport.height) // if off screen l/r
@@ -76,7 +76,7 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
     const cursorXFactor = leftFactor / (viewport.width / 2)
     // Define the minimum and maximum `position.z` values
     const minZ = slowDown ? 3 : 2
-    const maxZ = 6 
+    const maxZ = 5 
     const newZ = minZ + (maxZ - minZ) * cursorXFactor
     ref.current.position.z = active || ResetSlowDown
       ? MathUtils.lerp(ref.current.position.z, newZ, lerpSpeed)
@@ -95,15 +95,13 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
       ref.current.position.z = MathUtils.lerp(ref.current.position.z, 0, lerpSpeed * 0.25)
     }
 
-    if(distanceFromCenter > lerpThresholdMin){
-      ref.current.position.y = lerp(ref.current.position.y, !active ? 0 : y, lerpSpeed * 0.4)
-      ref.current.position.x = lerp(ref.current.position.x, !active ? 0 : x, lerpSpeed * 0.4)
+    const leftLimitX = -0.2 * viewport.width
+    if (x < leftLimitX) {
+      x = leftLimitX
     }
-    else{
-      ref.current.position.y = lerp(ref.current.position.y, !active ? 0 : 0, lerpSpeed * 0.8)
-      ref.current.position.x = lerp(ref.current.position.x, !active ? 0 : 0, lerpSpeed * 0.8)
-    }
-
+    ref.current.position.y = lerp(ref.current.position.y, !active ? 0 : y, lerpSpeed * 0.4)
+    ref.current.position.x = lerp(ref.current.position.x, !active ? 0 : x, lerpSpeed * 0.4)
+   
   })
   return (
     <mesh ref={ref}>
