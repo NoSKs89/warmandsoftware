@@ -35,6 +35,7 @@
     "react": "^18.2.0",
     "react-dat-gui": "^4.1.1",
     "react-dom": "^18.2.0",
+    "react-idle-timer": "^5.7.2",
     "react-postprocessing": "^1.4.0",
     "react-ruler-draggable": "^1.0.0",
     "react-scripts": "^5.0.1",

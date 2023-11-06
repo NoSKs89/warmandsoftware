@@ -28,9 +28,12 @@ const RotatingCubes = () => {
 const AnimatedText = animated(Text)
 //todo leave the color on selected.
 const CanvasText = forwardRef((props, ref) => {
+    const bIsMobile = props.bIsMobile
+    console.log('textMobile: ' + bIsMobile)
     const { viewport } = useThree()
-    const x = (viewport.width * 0.565)
-    const y = ((props.index - 2.25) * 1.22)
+    const angle = ((props.index / (4 - 1))) * (Math.PI)
+    const x = !bIsMobile ? (viewport.width * 0.565) : ((4  - 1 - props.index - 0.5))
+    const y = !bIsMobile ? ((props.index - 2.25) * 1.22) : Math.sin(angle) + 1.75
     const pos = [x, y, 0]
     const hoveredPosition = [...pos]
     hoveredPosition[2] = props.text === 'ABOUT' ? hoveredPosition[2] - 1.5 : hoveredPosition[2] - 1.5
@@ -61,7 +64,7 @@ const CanvasText = forwardRef((props, ref) => {
       }
     
     // console.log('pos: ' + pos + '; x: ' + x + '; y: ' + y + '; hovered pos: ' + hoveredPosition)
-    const posOffScren = [11, 0, 0]
+    const posOffScren = bIsMobile ? [0, 5, 0] : [11, 0, 0]
     const { color, fontSize, position, secondaryColor, strokeWidth } = useSpring({
         color: props.isClickable ? (props.currentItem === props.text || !hovered ? 'white' : 'grey') : props.color,
         secondaryColor: props.isClickable ? (props.currentItem === props.text || !hovered ? 'white' : 'grey') : 'black',
@@ -75,7 +78,7 @@ const CanvasText = forwardRef((props, ref) => {
         rotation: [25,0,45] 
     })
     return (
-        <animated.group ref={ref} position={position} className={'menuOption'}>
+        <animated.group ref={ref} position={position} className={'menuOption'} scale={bIsMobile ? 0.75 : 1}>
         <AnimatedText
             color={color}
             fontSize={fontSize}

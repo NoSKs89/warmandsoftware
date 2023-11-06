@@ -14,14 +14,14 @@ function GalleryToggle(props) {
   const [clicked, setClicked] = useState(false)
 
   const textShadowString = '5px 5px 5px #000'
-
+  const headerName = props.headerName
   useEffect(() => {
     if(props.ready){
       animate('.galleryToggleSun', {
         y: ['-30%', '15%'],
         opacity: [0, 1]
       }, { duration: 2, delay: 2 })
-      animate('.header h1', {
+      animate(`.${headerName} h1`, {
         textShadow: ['none', textShadowString]
       }, { duration: 2.5, delay: 2.5 })
       // animate('.textContent', {
@@ -29,7 +29,7 @@ function GalleryToggle(props) {
       // }, { duration: 2, delay: 0.25 })
     }
     else{
-      animate('.header h1', {
+      animate(`.${headerName} h1`, {
         textShadow: ['5px 5px 5px #000', 'none']
       }, { duration: 1, delay: 1 })
       animate('.galleryToggleSun', {
@@ -67,7 +67,7 @@ function GalleryToggle(props) {
         zIndex: [9, 7],
         // rotate: [0, 60],
       }, { duration: 2, delay: 1.5 })
-      animate('.header h1', {
+      animate(`.${headerName} h1`, {
         textShadow: [textShadowString, 'none']
       }, { duration: 1, delay: 2.5 })
       animate('.galleryContentSun', {
@@ -89,7 +89,7 @@ function GalleryToggle(props) {
         top: ['50%', '0%'],
         left: ['50%', '5%']
       }, { duration: 2, delay: 1.5 })
-      animate('.header h1', {
+      animate(`.${headerName} h1`, {
         textShadow: ['none', textShadowString]
       }, { duration: 1, delay: 2.5 })
       animate('.galleryContentSun', {

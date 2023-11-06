@@ -46,7 +46,6 @@
   }
   .header {
     position: absolute;
-    /* if using GalleryRemake2 use 2% */
     top: 2%; 
     left: 0;
     width: 100%;
@@ -57,13 +56,59 @@
     height: 4rem;
     z-index: 100;
     font-family: 'Bagel Fat One', cursive; 
-    /* // var(--fontFamily); */
     position: fixed;
     }
   .header h1 {
     font-size: 1rem;
     font-weight: 400;
   }
+  .header h5 {
+    font-size: 0.55rem;
+    font-weight: 100;
+    position: absolute;
+    top: 62.5%;
+    left: 7.2%;
+    display: none;
+  }
+
+  .headerMobile {
+    position: absolute;
+    bottom: -2%; 
+    left: -4%;
+    width: 110%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    height: 4rem;
+    z-index: 100;
+    font-size: 0.75rem;
+    font-family: 'Bagel Fat One', cursive; 
+    position: fixed;
+    /* background-color: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)) !important; */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+    /* opacity: 100% !important; */
+    
+  }
+  .headerMobile h1 {
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+  .headerMobile h6 {
+    font-size: 0.4rem;
+    position: absolute;
+    bottom: 25%;
+    left: 42%;
+  }
+  .headerMobile h5 {
+    font-size: 0.45rem;
+    font-weight: 100;
+    position: absolute;
+    top: 62.5%;
+    left: 7.2%;
+    display: none;
+  }
+
 
   .bg {
     background-color: #49a1eb;
@@ -131,9 +176,29 @@
       mask: var(--mask);
       scroll-behavior: smooth !important;
   }
+  @media only screen and (max-width: 768px) {
+    .textContent {
+      margin-right: 0rem;
+      margin-top: 5rem;
+      padding: 4rem 0.75rem 5rem 0.75rem; /* Top Right Bottom Left */
+      --mask:
+        radial-gradient(31.78px at 50% 40.50px,#000 99%,#0000 101%) calc(50% - 60px) 0/120px 100%,
+        radial-gradient(31.78px at 50% -10.5px,#0000 99%,#000 101%) 50% 30px/120px 100% repeat-x;
+      -webkit-mask: var(--mask);
+              mask: var(--mask);
+    }
+    /* .mobileTopSection {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 20%; 
+      background-color: #1B5E20; 
+      z-index: 10;
+    } */
+  }
   .subContent {
     background-color: gray !important;
-    /* box-shadow: 2px 3px 3px #000; */
     border-radius: 1rem;
     padding: 1rem;
     text-align: right;
@@ -144,7 +209,6 @@
   }
   .subContent2 {
     background-color: black !important;
-    /* box-shadow: -2px 2px 3px white; */
     text-align: left;
     border-radius: 1rem;
     padding: 1rem;
@@ -152,11 +216,6 @@
     padding-right: 3rem;
     pointer-events: none;
     z-index: 8 !important;
-  }
-  .hidden {
-    /* margin-top: 5rem; styleish? */
-    opacity: 0;
-    pointer-events: none;
   }
   .read {
     padding: 0.35rem 0.5rem 0 0;  /* Top Right Bottom Left */
@@ -176,6 +235,45 @@
     pointer-events: none;
     text-shadow: -6px 9px 9px black;
   }
+  @media only screen and (max-width: 768px) {
+    .subContent {
+      font-size: 1rem; 
+      margin-left: 1rem; 
+      padding: 0.5rem; 
+      padding-left: 1rem; 
+    }
+  
+    .subContent2 {
+      font-size: 1rem; 
+      margin-right: 1rem;
+      padding: 0.5rem;
+      padding-right: 1rem; 
+    }
+    .read {
+      padding: 0.45rem 0.25rem 0 0;  /* Top Right Bottom Left */
+      font-size: 0.65rem;
+      opacity: 0;
+      font-weight: 300;
+      text-align:right;
+      pointer-events: none;
+      text-shadow: 6px 9px 9px #000;
+    }
+    .read2 {
+      padding: 0.45rem 0 0 0.25rem;
+      font-size: 0.65rem;
+      opacity: 0;
+      font-weight: 300;
+      text-align:left;
+      pointer-events: none;
+      text-shadow: -6px 9px 9px black;
+    }
+  }
+  .hidden {
+    /* margin-top: 5rem; styleish? */
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .readContainer {
     /* background-color: transparent !important; */
     pointer-events: none;
@@ -218,8 +316,6 @@
     position: fixed;
     min-height: 12vh;
     min-width: 12vh;
-    /* max-height: 7.5rem; */
-    /* max-width: 7.5rem; */
     z-index: 9;
     background-color: red !important;
     text-align: center;
@@ -227,7 +323,13 @@
     left: 5%;
     border-radius: 50%;
     opacity: 1;
-    /* Add other styles for the .galleryToggle class as needed */
+  }
+  @media only screen and (max-width: 768px) {
+    .galleryToggleSun {
+      top: auto; 
+      bottom: -1%;
+      left: 15%; 
+    }
   }
   /* Create the glow effect using box-shadow */
   .galleryToggleSun::before {
@@ -428,7 +530,7 @@
   .social-container {
     padding: 0 0.5rem 1rem 0; /* Top Right Bottom Left */
     position: fixed;
-    z-index: 10;
+    z-index: 101;
     bottom: 0;
     right: 0;
   }
@@ -436,6 +538,15 @@
     margin: 0 0.75rem;
     transition: transform 250ms;
     display: inline-block;
+  }
+  @media only screen and (max-width: 768px) {
+    .social-container {
+      padding: 0.55rem;
+    }
+    a.social {
+      margin: 0 0.25rem; 
+      font-size: 25px; 
+    }
   }
   a.social:hover {
     transform: translateY(-0.5rem);
@@ -551,6 +662,7 @@
   z-index: 8 !important;
   min-height: 35vh;
 }
+
 .imgContainer {
   width: 75% !important; 
   height: 75% !important; 
@@ -563,6 +675,17 @@
   background-color: black;
   border: 8px solid black;
   opacity: 0;
+}
+@media only screen and (max-width: 768px) {
+  .imgStyle {
+    padding: 0.55rem;
+    min-width: 90vw !important;
+  }
+  .imgContainer {
+    margin-right: 10vw;
+    width: 85% !important;
+    height: 85% !important;
+  }
 }
 /* .imgContainer {
   width: 75% !important; 

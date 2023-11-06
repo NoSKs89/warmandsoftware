@@ -12,7 +12,7 @@ const lerp = (x, y, a) => {
   return Math.abs(x - y) < 0.001 ? y : r
 }
 
-function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, singlePoemIsActive, firstExplosionComplete, hovered, rand = THREE.MathUtils.randFloatSpread }) {
+function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, singlePoemIsActive, firstExplosionComplete, hovered, rand = THREE.MathUtils.randFloatSpread, bIsMobile }) {
   const lines = useMemo(() => {
     return Array.from({ length: count }, () => {
       const pos = new THREE.Vector3(rand(radius), rand(radius), rand(radius))
@@ -30,7 +30,7 @@ function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, single
   return lines.map((props, index) => <Fatline key={index} dash={dash} active={active} {...props} singlePoemIsActive={singlePoemIsActive} hovered={hovered} ResetSlowDown={ResetSlowDown} firstExplosionComplete={firstExplosionComplete} />)
 }
 
-function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowDown, firstExplosionComplete, singlePoemIsActive }) {
+function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowDown, firstExplosionComplete, singlePoemIsActive, bIsMobile }) {
   const { viewport, camera } = useThree()
   width = !hovered && !active ? width : width * 2
   const ref = useRef()
@@ -65,10 +65,14 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
     }
     
 
-    //lines internal rotation speed logic, increase on right, decrease on left. (but not as heavily.)
+    //lines internal rotation speed logic, increase on right, decrease on left. (but not as heavily.) (top and bottom for mobile)
     const dashSpeed = 10
     const positionXFactor = ref.current.position.x / (viewport.width / 2)
-    const speedMultiplier = (positionXFactor > 0 ? (positionXFactor > 0.2 ? 2 : 1.25) : 0.9) + positionXFactor
+    const positionYFactor = ref.current.position. y / (viewport.height / 2)
+    let speedMultiplier = (positionXFactor > 0 ? (positionXFactor > 0.2 ? 2 : 1.25) : 0.9) + positionXFactor
+    if(bIsMobile){
+      speedMultiplier = (positionYFactor > 0 ? (positionYFactor > 0.15 ? 2 : 1.25) : 0.9) + positionYFactor
+    }
     ref.current.material.dashOffset -= (delta * speed * speedMultiplier) / dashSpeed
 
     const lerpSpeed =  0.035
@@ -96,9 +100,12 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
     }
 
     const leftLimitX = -0.2 * viewport.width
-    if (x < leftLimitX) {
+    const rightLimitX = 0.4 * viewport.width
+    if (x < leftLimitX) 
       x = leftLimitX
-    }
+    else if(x > rightLimitX)
+      x = rightLimitX
+
     ref.current.position.y = lerp(ref.current.position.y, !active ? 0 : y, lerpSpeed * 0.4)
     ref.current.position.x = lerp(ref.current.position.x, !active ? 0 : x, lerpSpeed * 0.4)
    

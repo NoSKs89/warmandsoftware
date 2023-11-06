@@ -5,6 +5,7 @@ import { animated, SpringValue, useSpring, useChain, useTransition, useSpringRef
 import { a, config, useSpring as canvasUseSpring } from '@react-spring/three'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
+import { useIdleTimer } from 'react-idle-timer'
 
 import BabeAndI from './images/Photos/babeandi.jpg'
 import MenuCanvasText from './components/MenuCanvasText'
@@ -48,27 +49,6 @@ const MenuItemArray = [
 ]
 
 export default function App() {
-  //intro load animations
-  useEffect(() => {
-    animate('.header', {
-      y: [-100, 0],
-      opacity: [0, 1]
-    }, { duration: 1, delay: 1.5 })
-    animate('.social-container', {
-      y: [100, 0],
-      opacity: [0, 1]
-    }, { duration: 1, delay: 1.5 })
-    animate('section.About', {
-      y: [-100, 0],
-      opacity: [0, 1]
-    }, { duration: 1, delay: 0.5 })
-    animate('.menuOptions', {
-      top: ['-50%', '0%'],
-      left: ['-50%', '0%'],
-      opacity: [0, 1]
-    }, { duration: 1, delay: 0.5 })
-  }, [])
-
   //states
   const [canvasZindex, setCanvasZindex] = useState('0')
   const [bCanvasPointerEvents, setBCanvasPointerEvents] = useState(true)
@@ -95,9 +75,9 @@ export default function App() {
   const [showPoemMenu, setShowPoemMenu] = useState(false)
   const [bResetSlowDown, setBResetSlowDown] = useState(false)
   const [firstExplosionComplete, setFirstExplosionComplete] = useState(false)
+  const [singlePoemIsActive, setSinglePoemIsActive] = useState(false)
   const [canvasWidth, setCanvasWidth] = useState(window.innerWidth)
   const [canvasHeight, setCanvasHeight] = useState(window.innerHeight)
-  const [singlePoemIsActive, setSinglePoemIsActive] = useState(false)
   const handleWindowSizeChange = () => {
     setCanvasWidth(window.innerWidth)
     setCanvasHeight(window.innerHeight)
@@ -108,6 +88,101 @@ export default function App() {
               window.removeEventListener('resize', handleWindowSizeChange)
           }
   }, [])
+  const pixelRatio = Math.ceil(window.devicePixelRatio)
+  const bIsMobile = (canvasWidth <= 768) || (canvasHeight >= 1300) || (pixelRatio > 1 && canvasWidth <= 1000) 
+  const [headerClassName, setHeaderClassName] = useState(!bIsMobile ? 'header' : 'headerMobile')
+  useEffect(() => {
+    setHeaderClassName(bIsMobile ? 'headerMobile' : 'header')
+  }, [bIsMobile])
+  console.log('isMobile: ' + bIsMobile)
+  //intro load animations
+  useEffect(() => {
+    animate(`.${headerClassName}`, {
+      y: [-100, 0],
+      opacity: ['0%', '100%'],
+      background: 'transparent'
+    }, { duration: 1, delay: 1.5 })
+    animate('.social-container', {
+      y: [100, 0],
+      opacity: [1]
+    }, { duration: 1, delay: 0.5 })
+    animate('section.About', {
+      y: [-100, 0],
+      opacity: [0, 1]
+    }, { duration: 1, delay: 0.5 })
+    animate('.menuOptions', {
+      top: ['-50%', '0%'],
+      left: ['-50%', '0%'],
+      opacity: [0, 1]
+    }, { duration: 1, delay: 0.5 })
+  }, [])
+
+  const [idle, setIsIdle] = useState(false)
+  const [idleCount, setIdleCount] = useState(0)
+  const [idleRemaining, setIdleRemaining] = useState(0)
+  const onIdle = () => {
+    console.log('idling')
+      setIsIdle(true)
+  }
+  const onActive = () => {
+    console.log('activing')
+    setIsIdle(false)
+  }
+  const onAction = () => {
+    console.log('on action')
+    setIdleCount(idleCount + 1)
+  }
+  const { getRemainingTime } = useIdleTimer({
+    onIdle,
+    onActive,
+    onAction,
+    timeout: 2_500,
+    throttle: 500
+  })
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIdleRemaining(Math.ceil(getRemainingTime() / 1000))
+    }, 500)
+
+    return () => {
+      clearInterval(interval)
+    }
+  })
+  useEffect(() => {
+    if(bIsMobile){
+      if(currentItem === 'blank'){
+
+      }
+      else{
+        if(idle){
+          animate(`.${headerClassName}`, {
+            y: [-100, 0],
+            opacity: ['0%', '100%'],
+          }, { duration: 1, delay: 0 })
+          animate(`.${headerClassName}`, {
+            background: ['linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1))','linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))']
+          }, { duration: 1, delay: 0 })
+          animate('.social-container', {
+            y: [100, 0],
+            opacity: [1]
+          }, { duration: 1, delay: 0.5 })
+        }
+        else{
+          animate(`.${headerClassName}`, {
+            y: [0, -100],
+            opacity: ['0%'],
+          }, { duration: 1, delay: 0.5 })
+          animate(`.${headerClassName}`, {
+            background: ['linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))', 'linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))']
+          }, { duration: 0.5, delay: 0 })
+          animate('.social-container', {
+            y: [0, 100],
+            opacity: [0]
+          }, { duration: 1, delay: 0.5 })
+        }
+      }
+    }
+  }, [idle])
 
   //refs
   const scrollableContainerRef = useRef()
@@ -279,19 +354,19 @@ export default function App() {
     keys: currentItem,
     from: {
       opacity: 0,
-      transform: "translate3d(100%,0,0) scale(1)",
+      transform: bIsMobile ?  "translate3d(0,-100%,0) scale(1)" : "translate3d(100%,0,0) scale(1)",
       backgroundColor: MenuItemArray[lastIndex].primaryColor,
       zIndex: 3,
     },
     enter: {
       opacity: 1,
-      transform: "translate3d(0%,0,0) scale(1)",
+      transform: bIsMobile ? "translate3d(0,0%,0) scale(1)" : "translate3d(0%,0,0) scale(1)",
       backgroundColor: MenuItemArray[currentIndex].primaryColor,
       zIndex: 3, // Ensure the new content appears on top
     },
     leave: {
       opacity: 0,
-      transform: "translate3d(-100%,0,0) scale(0.1)",
+      transform: bIsMobile ?  "translate3d(0,-100%,0) scale(0.1)" : "translate3d(-100%,0,0) scale(0.1)",
       backgroundColor: MenuItemArray[lastIndex].primaryColor,
       zIndex: 3, 
     },
@@ -376,7 +451,7 @@ export default function App() {
   const [renderImage, setRenderImage] = useState(currentItem === 'ABOUT' && firstSubContent2)
   useEffect(() =>{ 
     if(currentItem === 'ABOUT' && firstSubContent2){
-      if(lastItem === ''){
+      if(lastItem === 'blank'){
         setRenderImage(true)
       }
       else {setTimeout(() => { setRenderImage(true)}, 600)} 
@@ -423,10 +498,11 @@ export default function App() {
         setCurrentItem={setCurrentItem}
         isClickable={isMenuItemClickable}
         setHovered={setHovered}
+        bIsMobile={bIsMobile}
       />
     ))}
       {!showGallery ? (
-        <Lines singlePoemIsActive={singlePoemIsActive} active={delay} dash={0.99} count={100} radius={1} hovered={!delay ? false : hovered} ResetSlowDown={bResetSlowDown} firstExplosionComplete={firstExplosionComplete} colors={['white', thisItem.primaryColor, thisItem.secondaryColor, thisItem.thirdColor]} />
+        <Lines bIsMobile={bIsMobile} singlePoemIsActive={singlePoemIsActive} active={delay} dash={0.99} count={100} radius={1} hovered={!delay ? false : hovered} ResetSlowDown={bResetSlowDown} firstExplosionComplete={firstExplosionComplete} colors={['white', thisItem.primaryColor, thisItem.secondaryColor, thisItem.thirdColor]} />
       ) : null}
       {loadGallery ? <Suspense fallback={null}>
           <GalleryContent showGallery={showGallery} />
@@ -434,12 +510,12 @@ export default function App() {
         : null}
       {/* <fog attach="fog" args={['#17171b', 0, 5]} /> */}
     </Canvas></div>
-    <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} />
+    <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} headerName={headerClassName} />
     <div className='body' ref={scrollableContainerRef}>
         <animated.div className='bg' ref={bgColorRef} style={{ backgroundColor }}>
-          <div className='header'>
-            <h1>WARM+SOFTWARE</h1>
-            <h6>BETA</h6>
+          <div className={headerClassName}>
+            <h1>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
+            <h6>{bIsMobile ? 'MOBILE' : 'BETA'}</h6>
           </div>
           <section className='About' style={{overflow: isAbsolute ? 'hidden !important' : 'auto'}}>
             <div className='scrollable-container'>
@@ -450,6 +526,7 @@ export default function App() {
                   ref={textContentRef}
                   style={{ ...style, position: isAbsolute ? 'absolute' : 'relative', top: 0, left: 0 }}
                 >
+                  {/* {bIsMobile ? <div className='mobileTopSection'></div> : null} */}
                   {(
                     //we create a new div for each time the text hits an \\n 
                     //every other has different css
