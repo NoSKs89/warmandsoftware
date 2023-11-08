@@ -12,6 +12,17 @@ const lerp = (x, y, a) => {
   return Math.abs(x - y) < 0.001 ? y : r
 }
 
+// Line Generation:
+// For each line, a position (pos) is created using random coordinates within a cubic space defined by the radius. This means the lines will be positioned randomly within a cube.
+// An array of points is generated, which will be used to create a curved path for the line. It starts with the initial position pos and 
+//.....then iteratively adds random displacement vectors to create a set of points.
+// A Catmull-Rom curve is created based on these points, and the curve is further subdivided into 300 equally spaced points. This will be the path that the line follows.
+// The line object includes the following properties:
+// color: A randomly selected color from the colors array.
+// width: The line's width, which is a random value within a range based on the radius.
+// speed: The speed at which the line travels, a random value.
+// curve: An array of coordinates that make up the path of the line. This array is flattened, meaning that the coordinates are stored as a flat sequence of numbers.
+
 function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, singlePoemIsActive, firstExplosionComplete, hovered, rand = THREE.MathUtils.randFloatSpread, bIsMobile }) {
   const lines = useMemo(() => {
     return Array.from({ length: count }, () => {
@@ -24,7 +35,7 @@ function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, single
         speed: Math.max(0.1, 1 * Math.random()),
         curve: curve.flatMap((point) => point.toArray())
       }
-    }, [colors])
+    }, [colors]) //perhaps I need to move the colors below?
   }, [count, radius]) //removing colors stops the re-render but then won't change color
 
   return lines.map((props, index) => <Fatline key={index} dash={dash} active={active} {...props} singlePoemIsActive={singlePoemIsActive} hovered={hovered} ResetSlowDown={ResetSlowDown} firstExplosionComplete={firstExplosionComplete} />)

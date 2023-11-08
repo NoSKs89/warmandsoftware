@@ -61,6 +61,7 @@
   .header h1 {
     font-size: 1rem;
     font-weight: 400;
+    /* z-index: 50; */
   }
   .header h5 {
     font-size: 0.55rem;
@@ -175,26 +176,37 @@
       -webkit-mask: var(--mask);
       mask: var(--mask);
       scroll-behavior: smooth !important;
+      will-change: transform, opacity, background-color, z-index;
   }
   @media only screen and (max-width: 768px) {
     .textContent {
+      will-change: transform, opacity, background-color, z-index;
       margin-right: 0rem;
       margin-top: 5rem;
       padding: 4rem 0.75rem 5rem 0.75rem; /* Top Right Bottom Left */
+      -webkit-mask: none;
+      /* mask: none; */
       --mask:
-        radial-gradient(31.78px at 50% 40.50px,#000 99%,#0000 101%) calc(50% - 60px) 0/120px 100%,
-        radial-gradient(31.78px at 50% -10.5px,#0000 99%,#000 101%) 50% 30px/120px 100% repeat-x;
-      -webkit-mask: var(--mask);
-              mask: var(--mask);
+      radial-gradient(2.18rem at 50% 3.08rem,#000 99%,#0000 101%) calc(50% - 3rem) 0/6rem 100%,
+      radial-gradient(2.18rem at 50% -1.58rem,#0000 99%,#000 101%) 50% 1.5rem/6rem 100% repeat-x;
+    -webkit-mask: var(--mask);
+            mask: var(--mask);
     }
     /* .mobileTopSection {
-      position: fixed;
+      position: fixed !important;
       top: 0;
       left: 0;
       width: 100%;
       height: 20%; 
       background-color: #1B5E20; 
       z-index: 10;
+      margin-top: 30%;
+      --mask:
+      radial-gradient(2.18rem at 50% 3.08rem,#000 99%,#0000 101%) calc(50% - 3rem) 0/6rem 100%,
+      radial-gradient(2.18rem at 50% -1.58rem,#0000 99%,#000 101%) 50% 1.5rem/6rem 100% repeat-x;
+    -webkit-mask: var(--mask);
+            mask: var(--mask);
+      
     } */
   }
   .subContent {
@@ -290,7 +302,7 @@
     width:50%;
     height:0%;
     bottom: 0%;
-    z-index: 11 !important;
+    /* z-index: 11 !important; */
     /* background-color: red; */
     left: 25%;
     border-radius: 50%;
@@ -429,6 +441,23 @@
       box-shadow: 0 0 20px 10px rgba(128, 128, 128, 0.2);
     }
 }
+  @keyframes blackGlowText {
+    0% {
+      text-shadow: 0 0 7.5px rgba(0, 0, 0, 0.5);
+      transform: scale(1) translateY(0);
+      opacity: 0.4;
+    }
+    50% {
+      text-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+      transform: scale(1.15) translateY(-50%);
+      opacity: 1;
+    }
+    100% {
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+      transform: scale(1.1) translateY(0);
+      opacity: 0.6;
+    }
+  }
   ::-webkit-scrollbar {display:none;}
   
 .scrollable-container{
@@ -589,6 +618,28 @@
     z-index: 100 !important;
   }
   
+  .upArrow {
+    opacity: 1;
+    position: fixed;
+    bottom: 5%;
+    left:50%;
+    font-size: 5rem;
+    font-weight: 400;
+    animation: blackGlowText 2s infinite; 
+    will-change: transform, opacity;
+    display: block;
+    pointer-events: all;
+    cursor: pointer;
+  }
+  @media only screen and (max-width: 768px) {
+    .upArrow {
+      position: absolute !important;
+      left:42.5% !important;
+      bottom: 2.5%;
+      font-size: 3rem;
+      animation: blackGlowText 2s infinite; 
+    }
+  }
   .circle-container {
     display: flex;
     justify-content: center;
@@ -602,6 +653,7 @@
     background-color: transparent;
     margin: 0 0.6vh; /* Adjust margin as needed */
     animation: scaleAndRotate 2s infinite ease-in-out;
+    will-change:auto;
   }
   
   .circle1 {
@@ -646,6 +698,7 @@
     background: radial-gradient(180deg, var(--bg-color) 0%, black 100%); 
   }
 }
+
 .minHeight {
   min-height: 35vh;
 }

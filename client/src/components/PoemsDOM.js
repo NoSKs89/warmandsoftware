@@ -44,7 +44,6 @@ const DomPoems = (props) => {
     const [activePoem, setActivePoem] = useState('')
     const [hoveredItem, setHoveredItem] = useState('')
     const springRef = useSpringRef()
-    //why is there opacity?
 
     useEffect(() => {
         if(activePoem !== '')

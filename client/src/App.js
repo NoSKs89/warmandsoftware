@@ -28,10 +28,31 @@ const TimeStickingComponent = ({ initialFormattedTime, everyOther }) => {
   )
 }
 
+const PrintZIndex = () => {
+  const elements = Array.from(document.querySelectorAll('*')) // Select all elements in the DOM and convert to an array
+    const elementsWithZIndex = elements
+      .map((element) => {
+        const zIndex = window.getComputedStyle(element).getPropertyValue('z-index')
+        const className = element.className
+        const tagName = element.tagName
+        return { element, zIndex, className, tagName }
+      })
+      .filter(({ zIndex }) => zIndex !== 'auto');
+    // Sort the elements by z-index in descending order
+    elementsWithZIndex.sort((a, b) => b.zIndex - a.zIndex)
+    elementsWithZIndex.forEach(({ className, tagName, zIndex }) => {
+      if (className) {
+        console.log(`Element with class: ${className}, tag: ${tagName}, z-index: ${zIndex}`)
+      } else {
+        console.log(`Element with tag: ${tagName}, z-index: ${zIndex}`)
+      }
+    })
+}
+
 const ContentTextArray = [
   //about //we contain multitudes. //My favorite voice is the gentle applause of birch trees, their lanky bodies swaying as leaves catch the wind. 
   //The basis of perception, is participation. The creative interplay of our overlapping senses link us to an animate world. \\nWe must depart from our devices and heads and return to our senses -- in doing so realizing our connection with the living, dynamic world.
-  "Hi. I'm a Midwest-based software developer, artist, sound designer and eclectic. \\nThis is me, with my fiance Brooke. <3 \\nI believe we should reclaim the terms 'amateur' and 'dilettante' from our consumerist society -- because interests and experiences that do not generate income are still enjoyable and valuable. \\nI enjoy hiking, reading, painting, writing, and making music. \\nMy favorite sounds are the fluttering of birch leaves and loon calls -- find them.\\n", //My patience is sparse for car and plane noise when I'm outdoors, Ask me about recording dolphins
+  "Hi. I'm a Midwest-based software developer, artist, sound designer and eclectic. \\nThis is me, with my fiance Brooke. <3 \\nFeel free to poke around; find the galleries on the bottom of the art and poems menus. Enjoy your stay! \\nI believe we should reclaim the terms 'amateur' and 'dilettante' from our consumerist society -- because interests and experiences that do not generate income are still enjoyable and valuable. \\nI enjoy hiking, reading, painting, writing, and making music. \\nMy favorite sounds are the fluttering of birch leaves and loon calls -- find them.\\n", //My patience is sparse for car and plane noise when I'm outdoors, Ask me about recording dolphins
   //art we are all travelers of a sensuous world.
   "Art is play, it is exploration, it is experimentation. It captures sensations, movements, emotions, in a given moment. \\nReaching through each person's filter, it affects their inner states, often unconsciously; thus, art can be incredibly therapeutic. \\nArt is inherently subjective; there is no standard for 'good' or 'bad' art, it either resonates in an individual or it does not. \\nFor me, it is a restless urge -- a drive to express myself every day.\\n",
   //poems
@@ -64,7 +85,8 @@ export default function App() {
   }, [currentItem]) 
   const [isMenuItemClickable, setIsMenuItemClickable] = useState(true) //used to remove the other menu items during transitions
   const [isAbsolute, setIsAbsolute] = useState(true) //ok this is dumb, but the transitions only show when absolute, yet I want it to be relative to expand the viewport.... so
-  
+  const [bUpArrowVisible, setUpArrowVisible] = useState(false)
+
   const [hovered, setHovered] = useState(false)
   const [showBottomMenu, setShowBottomMenu] = useState(false) //determines whether a div that transitions to art gallery on click is visible
   const [showGallery, setShowGallery] = useState(false) //determines if we should show the art gallery
@@ -94,7 +116,7 @@ export default function App() {
   useEffect(() => {
     setHeaderClassName(bIsMobile ? 'headerMobile' : 'header')
   }, [bIsMobile])
-  console.log('isMobile: ' + bIsMobile)
+  // console.log('isMobile: ' + bIsMobile)
   //intro load animations
   useEffect(() => {
     animate(`.${headerClassName}`, {
@@ -121,41 +143,72 @@ export default function App() {
   const [idleCount, setIdleCount] = useState(0)
   const [idleRemaining, setIdleRemaining] = useState(0)
   const onIdle = () => {
-    console.log('idling')
       setIsIdle(true)
   }
   const onActive = () => {
-    console.log('activing')
     setIsIdle(false)
   }
   const onAction = () => {
-    console.log('on action')
     setIdleCount(idleCount + 1)
   }
-  const { getRemainingTime } = useIdleTimer({
+  const { getRemainingTime, reset } = useIdleTimer({
     onIdle,
     onActive,
     onAction,
-    timeout: 2_500,
+    timeout: 5_500,
     throttle: 500
   })
+  //this block creates the idle interval 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIdleRemaining(Math.ceil(getRemainingTime() / 1000))
-    }, 500)
-
-    return () => {
-      clearInterval(interval)
+    if(bIsMobile){
+      if (currentItem !== 'blank') {
+        animate(`.${headerClassName} h1`, {
+          y: [-100],
+          opacity: ['0%'],
+        }, { duration: 1, delay: 0.15 })
+        animate(`.${headerClassName} h6`, {
+          y: [-100],
+          opacity: ['0%'],
+        }, { duration: 1, delay: 0.15 })
+        animate('.social-container', {
+          y: [100],
+          opacity: [0]
+        }, { duration: 1, delay: 0.15 })
+        const interval = setInterval(() => {
+          setIdleRemaining(Math.ceil(getRemainingTime() / 1000))
+        }, 500)
+        return () => {
+          clearInterval(interval)
+        }
+      } else {
+        // Clear the interval if currentItem is not 'blank'
+        setIdleRemaining(0) // Set idleRemaining to 0 when not 'blank'
+        animate(`.${headerClassName} h1`, {
+          y: [-100, 0],
+          opacity: ['0%', '100%'],
+        }, { duration: 1, delay: 0.15 })
+        animate(`.${headerClassName} h6`, {
+          y: [-100, 0],
+          opacity: ['0%', '100%'],
+        }, { duration: 1, delay: 0 })
+        animate('.social-container', {
+          y: [100, 0],
+          opacity: [1]
+        }, { duration: 1, delay: 0.25 })
+      }
     }
-  })
+  }, [currentItem])
   useEffect(() => {
     if(bIsMobile){
       if(currentItem === 'blank'){
-
       }
       else{
         if(idle){
-          animate(`.${headerClassName}`, {
+          animate(`.${headerClassName} h1`, {
+            y: [-100, 0],
+            opacity: ['0%', '100%'],
+          }, { duration: 1, delay: 0.15 })
+          animate(`.${headerClassName} h6`, {
             y: [-100, 0],
             opacity: ['0%', '100%'],
           }, { duration: 1, delay: 0 })
@@ -165,20 +218,24 @@ export default function App() {
           animate('.social-container', {
             y: [100, 0],
             opacity: [1]
-          }, { duration: 1, delay: 0.5 })
+          }, { duration: 1, delay: 0.25 })
         }
         else{
-          animate(`.${headerClassName}`, {
+          animate(`.${headerClassName} h1`, {
             y: [0, -100],
             opacity: ['0%'],
-          }, { duration: 1, delay: 0.5 })
+          }, { duration: 1, delay: 0.15 })
+          animate(`.${headerClassName} h6`, {
+            y: [0, -100],
+            opacity: ['0%'],
+          }, { duration: 1, delay: 0.15 })
           animate(`.${headerClassName}`, {
             background: ['linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))', 'linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))']
           }, { duration: 0.5, delay: 0 })
           animate('.social-container', {
             y: [0, 100],
             opacity: [0]
-          }, { duration: 1, delay: 0.5 })
+          }, { duration: 1, delay: 0.15 })
         }
       }
     }
@@ -205,8 +262,25 @@ export default function App() {
       setBottomMenuReady(false)
   }, [showGallery])
 
-  const ResetWindow = () => {
-    window.scrollTo(0, 0)
+  const ResetWindow = (className) => {
+    // console.log('Resetting Scroll')
+    if(className === undefined || className === '' || className === null){
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      })
+    }
+    else{
+      if(bIsMobile)
+         alert('resetting window for class: ' + className)
+      const targetDiv = document.getElementById(className)
+      const targetDivPosition = targetDiv.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({
+        top: targetDivPosition,
+        behavior: 'smooth' // You can use 'auto' for instant scrolling
+      })
+    }
     // setShowBottomMenu(false)
   }
 
@@ -248,6 +322,9 @@ export default function App() {
   const animationEasing = { easing: ["ease-in", "ease-out"] }
 
   const handleTransitionsComplete = () => {
+    // galleryToggle
+    reset() //unfortunately, this is the generic for the idle timer library. reset the timer on transition so that it waits a bit after animation
+    setUpArrowVisible(false)
     setFirstExplosionComplete(true)
     setIsAbsolute(false)
     window.scrollTo(0, 0)
@@ -285,7 +362,7 @@ export default function App() {
       animate(info.target.querySelector('h4'), { opacity: 1 }, { duration: 1.5, delay: Math.floor(Math.random() * 3) + 3, ...animationEasing })
       return leaveViewport
     }, {  amount: "all", once: "true" })
-    if((currentItem === 'ART' || currentItem === 'POEMS') && !ArtGalleryOpen && !showGallery){
+    if((currentItem !== 'blank') && !ArtGalleryOpen && !showGallery){
       inView('.pageEnd', () => { //when this invisible div is scrolled upon, toggle state to show art gallery or poem gallery.
         // console.log("pageEnd has entered the viewport")
         if((currentItem === 'ART') && !ArtGalleryOpen && !showGallery){
@@ -303,14 +380,34 @@ export default function App() {
             setBCanvasPointerEvents(true)
           }
         }
+        if(currentItem === 'ABOUT' || currentItem === 'GOALS'){
+          setTimeout(() => {
+            setUpArrowVisible(true)
+          }, 1500)
+          return () => {
+            setTimeout(() => {
+              setUpArrowVisible(false)
+            }, 1000)
+          }
+        }
         return null
       })
     }
     setIsMenuItemClickable(true) //after transition, re-enable click of menu items
-    // setCanvasZindex(0)
+    setBCanvasPointerEvents(true)
+    // setCanvasZindex('0')
   }
 
+  useEffect(() => {
+    console.log('menuClickable: ' + isMenuItemClickable + '; canvasPointerEvents: ' + bCanvasPointerEvents)
+  }, [bCanvasPointerEvents, isMenuItemClickable])
   const startTransition = () => {
+    // if(bCanvasPointerEvents && isMenuItemClickable && !showBottomMenu){
+    //   console.log('setting pointer events none')
+    //   animate('.galleryToggle', { pointerEvents: 'none' }, { duration: 0, delay: 0 }) //pointerEvents: 'none' is the problem
+    // }
+    reset() //unfortunately, this is the generic for the idle timer library. reset the timer on transition so that it waits a bit after animation
+    animate('.galleryToggle', { opacity: [1, 0], zIndex: 0 }, { duration: 2, delay: 0 }) //pointerEvents: 'none' is the problem
     setIsAbsolute(true)
     setShowBottomMenu(false)
     setShowGallery(false)
@@ -354,7 +451,7 @@ export default function App() {
     keys: currentItem,
     from: {
       opacity: 0,
-      transform: bIsMobile ?  "translate3d(0,-100%,0) scale(1)" : "translate3d(100%,0,0) scale(1)",
+      transform: bIsMobile ?  "translate3d(0,100%,0) scale(1)" : "translate3d(100%,0,0) scale(1)",
       backgroundColor: MenuItemArray[lastIndex].primaryColor,
       zIndex: 3,
     },
@@ -366,11 +463,11 @@ export default function App() {
     },
     leave: {
       opacity: 0,
-      transform: bIsMobile ?  "translate3d(0,-100%,0) scale(0.1)" : "translate3d(-100%,0,0) scale(0.1)",
+      transform: bIsMobile ?  "translate3d(0,100%,0) scale(1)" : "translate3d(-100%,0,0) scale(0.1)",
       backgroundColor: MenuItemArray[lastIndex].primaryColor,
       zIndex: 3, 
     },
-    config: config.molasses,
+    config: bIsMobile ? config.gentle : config.molasses,
     reset: false,  
     exitBeforeEnter: false,
     immediate: false,
@@ -401,7 +498,9 @@ export default function App() {
     position: 'fixed',
     zIndex: canvasZindex,
     background: 'transparent',
-    pointerEvents: bCanvasPointerEvents ? 'auto' : 'none'
+    pointerEvents: bCanvasPointerEvents ? 'auto' : 'none',
+    overflow: 'hidden'
+    // userSelect: 'none'
   }
 
   useEffect(() => {
@@ -428,6 +527,13 @@ export default function App() {
       setBottomMenuReady(true)
     } else {
       setBottomMenuReady(false)
+    }
+
+    if(currentItem === 'ABOUT' || currentItem === 'GOALS'){
+      setUpArrowVisible(true)
+    }
+    else{
+      setUpArrowVisible(false)
     }
   }, [showBottomMenu, currentItem, currentIndex])
 
@@ -464,22 +570,18 @@ export default function App() {
   }, [currentItem])
   //todo. 
   //find sfx library. make / record my own. recording voice noises like 'phewwwww', 'cutcha' https://theshubhagrwl.medium.com/you-might-not-need-a-sound-library-for-react-a265870dabda
-  //----every other text thing should make a shimmer and the final one loaded should be different
-  //do a spell check!!
   //test with hdmi toggled to ps4 (the width and height and scale is different)
   //fix colors with particles... I can't find a way to make it not re-render yet lerp the color....
   //add a 'hit me back' message with my email.
-  //add the titles to the art gallery.
   //add a sphere behind the main menu items that opacity = 1 when hovering... it rotates?.. or two stars that orbit the text? Could also add to header?
-  //color of the lines should shift, it's only changing on when first rendered.
-  //move stars on hover 4 menu
   //it seems like we can click the art gallery menu div even if it's not visible.. remove click events.
   //add a cooler scroll effect
-  //slow motion state for lines chugs quite a bit.
   //I think the zindex is fading back automatically on first menu item click for lines still...
   //create a blinking arrow or something to guide users to the end of the scroll
   //https://css-tricks.com/snippets/svg/curved-text-along-path/ curve don't stare at the sun
   //it would be cool to make the subContents springs as well so we could have them bounce on the transition
+  //add or remove will-change css where necessary. -- this seems to fix the mask on mobile but may have created the issue with the ellipses
+  //add a back to top arrow on the bottom of about/goals
   return (
     <>
     <div style={{ width: '100%', height: '100%'}}>
@@ -510,13 +612,14 @@ export default function App() {
         : null}
       {/* <fog attach="fog" args={['#17171b', 0, 5]} /> */}
     </Canvas></div>
-    <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} headerName={headerClassName} />
+    {bIsMobile ? null : <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} headerName={headerClassName} />}
     <div className='body' ref={scrollableContainerRef}>
         <animated.div className='bg' ref={bgColorRef} style={{ backgroundColor }}>
           <div className={headerClassName}>
-            <h1>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
+            <h1 onClick={() => ResetWindow('textContent')}>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
             <h6>{bIsMobile ? 'MOBILE' : 'BETA'}</h6>
           </div>
+          {bIsMobile ? <div className='mobileTopSection'></div> : null}
           <section className='About' style={{overflow: isAbsolute ? 'hidden !important' : 'auto'}}>
             <div className='scrollable-container'>
             {contentTransitions((style, item) =>
@@ -526,7 +629,6 @@ export default function App() {
                   ref={textContentRef}
                   style={{ ...style, position: isAbsolute ? 'absolute' : 'relative', top: 0, left: 0 }}
                 >
-                  {/* {bIsMobile ? <div className='mobileTopSection'></div> : null} */}
                   {(
                     //we create a new div for each time the text hits an \\n 
                     //every other has different css
@@ -551,6 +653,7 @@ export default function App() {
                     ) })
                   )}
                   <div className='pageEnd'></div>
+                  {bUpArrowVisible ? <span className='upArrow' onClick={() => ResetWindow()}>&#8593;</span> : null}
                 </animated.div>
               )
             )}

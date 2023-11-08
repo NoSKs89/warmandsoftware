@@ -11,16 +11,18 @@ const Stars = {
     //https://codesandbox.io/s/react-three-fiber-particles-ii-moio2
 }
 
-const RotatingCubes = () => {
+const RotatingCubes = (props) => {
     const groupRef = useRef();
     useFrame(() => {
       groupRef.current.rotation.x += 0.01; // Rotate around X-axis
       groupRef.current.rotation.y += 0.01; // Rotate around Y-axis
+      // groupRef.current.position.x = position[0]
+      // groupRef.current.position.y = position[1]
+      // groupRef.current.position.z = position[2]
     });
     return (
-      <group ref={groupRef} scale={[0.5, 0.5, 0.5]}>
-        <Box position={[-2, 0, -2]} scale={[0.05, 0.05, 0.05]} color="red" />
-        <Box position={[2, 0, 2]} scale={[0.5, 0.5, 0.5]} color="blue" />
+      <group ref={groupRef}>
+        <Box position={props.position} wireframe={true} color="white" />
       </group>
     );
 }
@@ -29,16 +31,22 @@ const AnimatedText = animated(Text)
 //todo leave the color on selected.
 const CanvasText = forwardRef((props, ref) => {
     const bIsMobile = props.bIsMobile
-    console.log('textMobile: ' + bIsMobile)
     const { viewport } = useThree()
     const angle = ((props.index / (4 - 1))) * (Math.PI)
     const x = !bIsMobile ? (viewport.width * 0.565) : ((4  - 1 - props.index - 0.5))
-    const y = !bIsMobile ? ((props.index - 2.25) * 1.22) : Math.sin(angle) + 1.75
+    const y = !bIsMobile ? ((props.index - 2.25) * 1.22) : Math.sin(angle) + 2
     const pos = [x, y, 0]
     const hoveredPosition = [...pos]
-    hoveredPosition[2] = props.text === 'ABOUT' ? hoveredPosition[2] - 1.5 : hoveredPosition[2] - 1.5
-    hoveredPosition[0] = hoveredPosition[0] + 1
-    hoveredPosition[1] = props.text === 'ABOUT' || props.text === 'ART'? hoveredPosition[1] - 0.25 : hoveredPosition[1]
+    if(!bIsMobile){
+      hoveredPosition[2] = props.text === 'ABOUT' ? hoveredPosition[2] - 1.5 : hoveredPosition[2] - 1.5
+      hoveredPosition[0] = hoveredPosition[0] + 1
+      hoveredPosition[1] = props.text === 'ABOUT' || props.text === 'ART'? hoveredPosition[1] - 0.25 : hoveredPosition[1]
+    }
+    else{
+      hoveredPosition[0] = 0
+      hoveredPosition[1] = 1.5
+      hoveredPosition[2] = props.text === 'ART' || props.text === 'POEMS' ? 0 : 0
+    }
     const onClick = () => {
         if(!props.isClickable){
             return
@@ -75,9 +83,10 @@ const CanvasText = forwardRef((props, ref) => {
     })
     const { rotation } = useSpring({
         // rotation: props.isClickable ? [25,0,45] : [25,0,44], // for some reason this like spins around a bunch...
-        rotation: [25,0,45] 
+        rotation: !bIsMobile ? [25,0,45] : (props.currentItem === props.text ? [25, 0, 44] : [25, 0, 45])
     })
     return (
+        <>
         <animated.group ref={ref} position={position} className={'menuOption'} scale={bIsMobile ? 0.75 : 1}>
         <AnimatedText
             color={color}
@@ -100,8 +109,10 @@ const CanvasText = forwardRef((props, ref) => {
             >
             {props.text}
         </AnimatedText>
-        {/* {hovered ? <RotatingCubes /> : null} */}
-        </animated.group>)
+        </animated.group>
+        {/* <RotatingCubes position={[0,0,0]}/> */}
+        </>
+        )
 })
 
 export default CanvasText

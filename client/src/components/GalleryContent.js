@@ -183,11 +183,8 @@ const AText3D = (props) => {
     // textRef.current.rotation.x = damp(textRef.current.rotation.x, rotationX, 3, delta)
     // textRef.current.rotation.y = damp(textRef.current.rotation.y, rotationY, 3, delta)
     
-    // The offset is between 0 and 1, you can apply it to your models any way you like
+    // The offset is between 0 and 1
     const offset = scroll.offset
-    // textRef.current.position.y = damp(textRef.current.position.y, offset, 3, delta)
-    // textRef.current.position.x = (-estimatedWidth / 2) + offset * 6.5
-
 
     // Update the rotation of the group instead of the text
     groupRef.current.rotation.x = damp(groupRef.current.rotation.x, rotationX, 4, delta);

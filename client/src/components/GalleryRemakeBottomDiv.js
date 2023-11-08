@@ -103,6 +103,10 @@ function GalleryToggle(props) {
       }
       else{
         // animate('.galleryToggle', {
+        //   pointerEvents: 'none',
+        // }, { duration: 0, delay: 0 })
+        console.log('clicked: ' + clicked)
+        // animate('.galleryToggle', {
         //   bottom: ['-20%', '0%'],
         //   opacity: [0],
         //   height: ['35%', '0%'],
