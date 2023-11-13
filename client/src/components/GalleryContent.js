@@ -60,7 +60,7 @@ const textFragmentShader = `
 //   fragmentShader: textFragmentShader,
 // })
 
-function Item({ index, position, scale, showGallery, onImgClick, c = new THREE.Color(), ...props }) {
+function Item({ index, position, scale, showGallery, onImgClick, bIsMobile, c = new THREE.Color(), ...props }) {
   const ref = useRef()
   const scroll = useScroll()
   const { clicked, urls } = useSnapshot(state)
@@ -74,7 +74,6 @@ function Item({ index, position, scale, showGallery, onImgClick, c = new THREE.C
     }
     onImgClick(index)    
     (state.clicked = index === clicked ? null : index)
-    console.log('clicked...')
   } 
   const over = () => hover(true)
   const out = () => hover(false)
@@ -85,7 +84,7 @@ function Item({ index, position, scale, showGallery, onImgClick, c = new THREE.C
       const y = scroll.curve(index / urls.length - 1.5 / urls.length, 4 / urls.length)
 
       //changes the scaling (size) of the items based on their scrolled position or whether it is clicked
-      ref.current.material.scale[1] = ref.current.scale.y = damp(ref.current.scale.y, clicked === index ? 5 : 4 + y, 8, delta)
+      ref.current.material.scale[1] = ref.current.scale.y = damp(ref.current.scale.y, clicked === index ? 5 : bIsMobile ? 3 + y : (4 + y), 8, delta)
       ref.current.material.scale[0] = ref.current.scale.x = damp(ref.current.scale.x, clicked === index ? 4.7 : scale[0], 6, delta)
       
       //this is super slick. controls the x-axis position of the objects based on whether it is to the left of, right of, or is the clicked object. 
@@ -187,21 +186,21 @@ const AText3D = (props) => {
     const offset = scroll.offset
 
     // Update the rotation of the group instead of the text
-    groupRef.current.rotation.x = damp(groupRef.current.rotation.x, rotationX, 4, delta);
-    groupRef.current.rotation.y = damp(groupRef.current.rotation.y, rotationY, 3, delta);
+    groupRef.current.rotation.x = damp(groupRef.current.rotation.x, rotationX, 4, delta)
+    groupRef.current.rotation.y = damp(groupRef.current.rotation.y, rotationY, 3, delta)
 
     // Update the position of the group instead of the text
-    groupRef.current.position.y = damp(groupRef.current.position.y, offset - 0.5, 3, delta);
-    groupRef.current.position.x = (-estimatedWidth / 2) + offset * 6.5;
+    groupRef.current.position.y = damp(groupRef.current.position.y, offset - 0.5, 3, delta)
+    groupRef.current.position.x = (-estimatedWidth / 2) + offset * (props.bIsMobile ? 8.5 : 6.5)
 
     if (materialRef.current) {
-      materialRef.current.uniforms.time.value = Math.sin(clock.elapsedTime); // Update time based on elapsed time
+      materialRef.current.uniforms.time.value = Math.sin(clock.elapsedTime) // Update time based on elapsed time
     }
   })
   
   return (
     <group ref={groupRef}>
-    <Text3D ref={textRef} font={bagelFatOne} letterSpacing={-0.01} size={0.15} position={[-0.5, 1, 3]} anchorX="center">
+    <Text3D ref={textRef} font={bagelFatOne} letterSpacing={-0.01} size={props. bIsMobile ? 0.1 : 0.15} position={[-0.5, 1, 3]} anchorX="center">
       {props.artTitle}
       <meshNormalMaterial />
       {/* <primitive object={textRef.current} material={customMaterial} /> */}
@@ -211,7 +210,7 @@ const AText3D = (props) => {
 }
 
 //Make the text3drotate up and down left and right without fully turning
-function Items({ w = 0.7, gap = 0.15, showGallery }) {
+function Items({ w = 0.7, gap = 0.15, showGallery, bIsMobile }) {
   const { urls } = useSnapshot(state)
   const { width } = useThree((state) => state.viewport)
   const { viewport } = useThree()
@@ -228,9 +227,9 @@ function Items({ w = 0.7, gap = 0.15, showGallery }) {
     <ScrollControls horizontal damping={0.5} pages={(width - xW + urls.length * xW) / width}>
       {showGallery ?
       <Scroll>
-      {urls.map((url, i) => <Item key={i} index={i} position={[i * xW, 0, 0]} showGallery={showGallery} scale={[w, 4, 1]} url={url} onImgClick={() => onClick(i)} />)}
+      {urls.map((url, i) => <Item key={i} index={i} bIsMobile={bIsMobile} position={[i * xW, 0, 0]} showGallery={showGallery} scale={[w, 4, 1]} url={url} onImgClick={() => onClick(i)} />)}
       {showGallery ?
-        <AText3D artTitle={artTitle} />
+        <AText3D artTitle={artTitle} bIsMobile={bIsMobile} />
       : null}
       </Scroll>
       : null}

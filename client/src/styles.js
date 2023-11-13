@@ -36,17 +36,15 @@ const Container = styled(animated.div)`
   grid-template-columns: repeat(4, minmax(100px, 1fr));
   grid-gap: 25px;
   padding: 25px;
-  background: white;
+  background: #003049;
   border-radius: 5px;
   cursor: pointer;
   box-shadow: 0px 10px 10px -5px rgba(0, 0, 0, 0.05);
   will-change: width, height;
   border: 0.125vw solid white;
-  background: linear-gradient(135deg, #d62828 0%, #003049 100%);
+  color: 'white';
   animation: blackGlow 2s infinite; 
-//   border-radius: 100%;
 `
-
 const Item = styled(animated.div)`
   width: 100%;
   height: 100%;
@@ -57,7 +55,37 @@ const Item = styled(animated.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  // align-self: center;
 `
 
-export { Global, Container, Item }
+const ContainerMobile = styled(animated.div)`
+  position: fixed;
+  top: 150%;
+  left: 50%;
+  transform: translate(-50%, -50%); //makes top/left actually the centerpoint of the div instead of the top left corner
+  display: grid;
+  grid-template-columns: repeat(2, minmax(100px, 1fr));
+  grid-gap: 20px;
+  padding: 20px;
+  background: #003049;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 10px 10px -5px rgba(0, 0, 0, 0.05);
+  will-change: width, height;
+  border: 0.125vw solid white;
+  color: 'white';
+  animation: blackGlow 2s infinite; 
+`
+
+const ItemMobile = styled(animated.div)`
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 5px;
+  will-change: transform, opacity;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+export { Global, Container, ContainerMobile, Item, ItemMobile }

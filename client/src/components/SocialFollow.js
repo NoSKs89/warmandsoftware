@@ -5,12 +5,17 @@ import {
     faFacebook,
     faTwitter,
     faInstagram,
-    faSoundcloud
+    faSoundcloud,
+    faLinkedin
   } from "@fortawesome/free-brands-svg-icons";
   
 export default function SocialFollow() {
   return (
     <div className="social-container">
+      <a href="https:///www.linkedin.com/in/stephenmerickson"
+        className="linkedin social" target="_blank">
+        <FontAwesomeIcon icon={faLinkedin} size="1x" />
+      </a>
     <a href="https://soundcloud.com/smerickson89"
         className="soundcloud social" target="_blank">
         <FontAwesomeIcon icon={faSoundcloud} size="1x" />
@@ -28,5 +33,6 @@ export default function SocialFollow() {
       </a>
     </div>
     //SUBSTACK.COM/@WARMANDSOFT
+    //www.linkedin.com/in/stephenmerickson
   );
 }

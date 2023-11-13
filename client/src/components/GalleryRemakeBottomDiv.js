@@ -12,7 +12,6 @@ function GalleryToggle(props) {
   const [isClickable, setIsClickable] = useState(true)
   const [clicked, setClicked] = useState(false)
   const [textState, setTextState] = useState('SHOW GALLERY')
-
   const doOpenAnimation = () => {
     animate('.galleryToggle', { //animate it upward to the middle
       bottom: ['-20%', '50%'],
@@ -99,7 +98,7 @@ function GalleryToggle(props) {
           bottom: ['-20%', '0%'],
           opacity: [0],
           height: ['35%', '0%'],
-        }, { duration: 0, delay: 0 })
+        }, { duration: 1, delay: 0 })
       }
       else{
         // animate('.galleryToggle', {

@@ -1,16 +1,28 @@
 // Gradients taken from: https://webgradients.com/
 export default [
+	// {
+	// 	title: "a running brook",
+	// 	selected: false,
+	// 	font: null,
+	// 	color: null,
+	// 	backgroundColor: null,
+	// 	text: "with no falter— nor caution, \\nher waters run gently against stone and foundation.\\ndeep enough for life to swirl and bubble without ration;\\nsoft enough to float on seeds— those born of nature’s passion.\\n \\nthose who snarl and those who gather mend among her shores.\\ninstinctually, intake and swell; her flavour: it restores.\\nthe winds, they sway in parallel: an ecclesiastes breeze.\\nthey whisper:\\neven in autumn, her beauty never leaves.\\n",
+    //     description: '#a8edea → #fed6e3',
+    //     css: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    //     height: 300,
+	// 	brief: true
+	// },
 	{
-		title: "a running brook",
+		title: "Belong",
 		selected: false,
 		font: null,
 		color: null,
 		backgroundColor: null,
-		text: "with no falter— nor caution, \\nher waters run gently against stone and foundation.\\ndeep enough for life to swirl and bubble without ration;\\nsoft enough to float on seeds— those born of nature’s passion.\\n \\nthose who snarl and those who gather mend among her shores.\\ninstinctually, intake and swell; her flavour: it restores.\\nthe winds, they sway in parallel: an ecclesiastes breeze.\\nthey whisper:\\neven in autumn, her beauty never leaves.\\n",
-        description: '#a8edea → #fed6e3',
-        css: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-        height: 300,
-		brief: true
+		text: "I was taught to look both ways, but grow into one. Yet I find, there’s more than one story. \\n\\n there’s more than one narrative. \\n \\n there’s more than one protagonist.\\n\\n There’s more than one: villain, opinion, decision, and step; \\n\\n more than one: challenge and limit, tangent and reason.\\n \\nmore than one: season, breath, horizon and shape \\n\\n more than one: storm, valley, breeze and escape\\n\\nthere’s more than one option, but I must make a choice. it won’t be a chorus, without my added voice. \\n\\nI’ll find community in ‘others’. defend a place that I choose. protect and admire the one we can’t lose.\\n\\n there’s multiple rhythms, hearts beating as one. \\n\\nthere’s more than one creature that’s singing our song. \\n\\n now it is crucial. allow this thought to dawn there’s only one earth to which all belong.",
+		description:  '#a8edea → #fed6e3',
+		css: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        height: 400,
+		brief: false
 	},
 	{
 		title: "While We’re Here",

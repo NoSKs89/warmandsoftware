@@ -4,6 +4,7 @@ import { useEffect, useState, forwardRef, useRef } from 'react'
 import { animated, SpringValue, useSpring, config } from '@react-spring/three'
 import * as THREE from 'three'
 import Box from '../components/Box'
+import { Select } from '@react-three/postprocessing'
 
 
 const Stars = {
@@ -88,6 +89,7 @@ const CanvasText = forwardRef((props, ref) => {
     return (
         <>
         <animated.group ref={ref} position={position} className={'menuOption'} scale={bIsMobile ? 0.75 : 1}>
+        <Select enabled={false}>
         <AnimatedText
             color={color}
             fontSize={fontSize}
@@ -107,8 +109,8 @@ const CanvasText = forwardRef((props, ref) => {
             onClick={onClick}
             rotation={rotation}
             >
-            {props.text}
-        </AnimatedText>
+            {bIsMobile && props.hideMenuItems ? '' : props.text}
+        </AnimatedText></Select>
         </animated.group>
         {/* <RotatingCubes position={[0,0,0]}/> */}
         </>

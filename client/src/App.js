@@ -3,7 +3,7 @@ import { animate, inView } from 'motion'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { animated, SpringValue, useSpring, useChain, useTransition, useSpringRef } from "@react-spring/web"
 import { a, config, useSpring as canvasUseSpring } from '@react-spring/three'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import { Selection, Select, EffectComposer, Bloom, Noise, Vignette, SelectiveBloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { useIdleTimer } from 'react-idle-timer'
 
@@ -16,10 +16,9 @@ import SunMenu from './components/GalleryRemakeSun'
 import GalleryRemakeBottom from './components/GalleryRemakeBottomDiv'
 import MenuItem from 'antd/lib/menu/MenuItem'
 import GalleryContent from './components/GalleryContent'
-// const GalleryContent = lazy(() => import('./components/GalleryContent'))
 import DOMPoems from './components/PoemsDOM'
 import GlowingCanvas from './components/EffectCompositions/GlowingCanvas'
-import { ConsoleSqlOutlined } from '@ant-design/icons'
+import { Effect } from 'postprocessing'
 
 const TimeStickingComponent = ({ initialFormattedTime, everyOther }) => {
   const [stickyTime, setStickyTime] = useState(initialFormattedTime)
@@ -50,13 +49,12 @@ const PrintZIndex = () => {
 }
 
 const ContentTextArray = [
-  //about //we contain multitudes. //My favorite voice is the gentle applause of birch trees, their lanky bodies swaying as leaves catch the wind. 
   //The basis of perception, is participation. The creative interplay of our overlapping senses link us to an animate world. \\nWe must depart from our devices and heads and return to our senses -- in doing so realizing our connection with the living, dynamic world.
-  "Hi. I'm a Midwest-based software developer, artist, sound designer and eclectic. \\nThis is me, with my fiance Brooke. <3 \\nFeel free to poke around; find the galleries on the bottom of the art and poems menus. Enjoy your stay! \\nI believe we should reclaim the terms 'amateur' and 'dilettante' from our consumerist society -- because interests and experiences that do not generate income are still enjoyable and valuable. \\nI enjoy hiking, reading, painting, writing, and making music. \\nMy favorite sounds are the fluttering of birch leaves and loon calls -- find them.\\n", //My patience is sparse for car and plane noise when I'm outdoors, Ask me about recording dolphins
+  "Hi. I'm a Midwest-based software developer, artist, sound designer and eclectic. \\nThis is me, with my fiance Brooke. <3 \\nFeel free to poke around; and be sure to find the galleries on the bottom of the art and poem menus. \\nI believe we should reclaim the terms 'amateur' and 'dilettante' from our consumerist society -- because interests and experiences that do not generate income are still enjoyable and valuable. \\nI enjoy hiking, reading, painting, writing, and making music. \\nMy favorite sounds are the fluttering of birch leaves and loon calls -- find them.\\n", //My patience is sparse for car and plane noise when I'm outdoors, Ask me about recording dolphins
   //art we are all travelers of a sensuous world.
   "Art is play, it is exploration, it is experimentation. It captures sensations, movements, emotions, in a given moment. \\nReaching through each person's filter, it affects their inner states, often unconsciously; thus, art can be incredibly therapeutic. \\nArt is inherently subjective; there is no standard for 'good' or 'bad' art, it either resonates in an individual or it does not. \\nFor me, it is a restless urge -- a drive to express myself every day.\\n",
   //poems
-  "Poetry allows individuals to express their emotions and experiences in a structured, cathartic way: releasing stress, lowering cortisol levels, and promoting neuroplasticity. \\nPoetry mirrors the era of oral history -- where rhythm and meter were incorporated not only to aid memory, but infuse life into the tales.  In this way, oral history became a vibrant and communal experience spanning generations.\\nPoetry also spreads emotional resonance and cognitive stimulation. Metaphor meets us half way, it comes to us, stirring lonely souls, sparking empathy in the harshest minds. \\nThe resonance of words travels farther when accompanied by a beat.\\n",
+  "Poetry allows individuals to express their emotions and experiences in a structured, cathartic way: releasing stress, lowering cortisol levels, and promoting neuroplasticity. \\nPoetry mirrors the era of oral history -- where rhythm and meter were incorporated not only to aid memory, but infuse life into the tales.  In this way, oral history became a vibrant and communal experience spanning generations.\\nPoetry also spreads emotional resonance and cognitive stimulation. Metaphor meets us half way, it comes to us, stirring lonely souls, sparking empathy in the harshest minds. \\nThis resonance travels further when accompanied by rhythm.\\n",
   //goals //my secondary goal is to understand how to use less energy and be more efficient within my current profession
   "To be humbled and hungry to learn more of this unquantifiable existence. \\nWorried by the state of the world in the wake of consumerism. I believe that change is attainable, but only once we stop letting corporations control and influence from the shadows. \\nI'm working towards developing an informational platform: to raise awareness and share truth. \\nWe must realize that the planet and the life inhabiting it are an extension of our own bodies -- that the narrative for a thousand years of human exceptionalism has pushed our psyches further away from our own bodily senses, and one another. \\nAre we bound to a future of sitting idly in our own bubbles, hating the unfamiliar? \\nWe must come to understand that we are not separate. Not separate from our planet, our neighbors, our senses. \\nWhere we focus grows, and our attention is victim to the influence of endless agendas and actors. \\nI hope to use my skills to create a platform, founded in truth and compassion, that attempts to nudge us away from this.\\n"
 ]
@@ -86,7 +84,7 @@ export default function App() {
   const [isMenuItemClickable, setIsMenuItemClickable] = useState(true) //used to remove the other menu items during transitions
   const [isAbsolute, setIsAbsolute] = useState(true) //ok this is dumb, but the transitions only show when absolute, yet I want it to be relative to expand the viewport.... so
   const [bUpArrowVisible, setUpArrowVisible] = useState(false)
-
+  const [hideMenuItems, setHideMenuItems] = useState(false)
   const [hovered, setHovered] = useState(false)
   const [showBottomMenu, setShowBottomMenu] = useState(false) //determines whether a div that transitions to art gallery on click is visible
   const [showGallery, setShowGallery] = useState(false) //determines if we should show the art gallery
@@ -246,7 +244,7 @@ export default function App() {
   const textContentRef = useSpringRef()
   const menuRef = useSpringRef()
   const bgColorRef = useSpringRef()
-  const sceneRef = useRef()
+  const lightsRef = useRef()
 
   //used to delay the art gallery load so it doesn't hiccup...//todo: make it NOT hiccup D:
   useEffect(() => {
@@ -281,13 +279,22 @@ export default function App() {
         behavior: 'smooth' // You can use 'auto' for instant scrolling
       })
     }
-    // setShowBottomMenu(false)
   }
 
   useEffect(() => {
     if(currentItem !== 'blank'){ //if a menu item is chosen
       // console.log('currentItem: ' + currentItem)
       // textContentRef.start()
+      if(!bIsMobile){
+        animate('.galleryToggleSun', {
+          pointerEvents: 'none'
+        }, { duration: 0 })
+      }
+      if(bIsMobile){
+        animate('.cDiv', {
+          touchAction: 'none'
+        }, { duration: 0 })
+      }
       setTimeout(() => {
         setLastItem(currentItem)
       }, 1200)
@@ -298,6 +305,16 @@ export default function App() {
       }
     }
     else { //if no main menu item selected
+      if(!bIsMobile){
+        animate('.galleryToggleSun', {
+          pointerEvents: 'all'
+        }, { duration: 0 })
+      }
+      if(bIsMobile){
+        animate('.cDiv', {
+          touchAction: 'none'
+        }, { duration: 0 })
+      }
       setFirstExplosionComplete(false)
       // textContentRef.delete() 
       setShowBottomMenu(false) //if no menu, we should never see the art gallery menu
@@ -362,13 +379,12 @@ export default function App() {
       animate(info.target.querySelector('h4'), { opacity: 1 }, { duration: 1.5, delay: Math.floor(Math.random() * 3) + 3, ...animationEasing })
       return leaveViewport
     }, {  amount: "all", once: "true" })
-    if((currentItem !== 'blank') && !ArtGalleryOpen && !showGallery){
+    if((currentItem !== 'blank')){
       inView('.pageEnd', () => { //when this invisible div is scrolled upon, toggle state to show art gallery or poem gallery.
         // console.log("pageEnd has entered the viewport")
         if((currentItem === 'ART') && !ArtGalleryOpen && !showGallery){
           setShowBottomMenu(true)
           return () => {
-            // console.log('Scrolling away from pageEnd. ShowGallery: ' + showGallery + '; ArtGalleryOpen: ' + ArtGalleryOpen)
             if(!showGallery && !ArtGalleryOpen && !showBottomMenu)
               setShowBottomMenu(false) //this hides it when we scroll away -- but currently it also it is causing the onclick issue.
           }
@@ -395,21 +411,24 @@ export default function App() {
     }
     setIsMenuItemClickable(true) //after transition, re-enable click of menu items
     setBCanvasPointerEvents(true)
-    // setCanvasZindex('0')
   }
 
   useEffect(() => {
-    console.log('menuClickable: ' + isMenuItemClickable + '; canvasPointerEvents: ' + bCanvasPointerEvents)
-  }, [bCanvasPointerEvents, isMenuItemClickable])
+    if(showBottomMenu){
+      animate('.galleryToggle', { pointerEvents: 'all' }, { duration: 0, delay: 0 }) //pointerEvents: 'none' is the problem
+    }
+    else{
+      animate('.galleryToggle', { pointerEvents: 'none' }, { duration: 0, delay: 0 }) //pointerEvents: 'none' is the problem
+    }
+  }, [showBottomMenu])
+
   const startTransition = () => {
-    // if(bCanvasPointerEvents && isMenuItemClickable && !showBottomMenu){
-    //   console.log('setting pointer events none')
-    //   animate('.galleryToggle', { pointerEvents: 'none' }, { duration: 0, delay: 0 }) //pointerEvents: 'none' is the problem
-    // }
     reset() //unfortunately, this is the generic for the idle timer library. reset the timer on transition so that it waits a bit after animation
     animate('.galleryToggle', { opacity: [1, 0], zIndex: 0 }, { duration: 2, delay: 0 }) //pointerEvents: 'none' is the problem
     setIsAbsolute(true)
     setShowBottomMenu(false)
+    setShowPoemMenu(false)
+    setUpArrowVisible(false)
     setShowGallery(false)
     setArtGalleryOpen(false)
     setBottomMenuReady(false)
@@ -507,7 +526,9 @@ export default function App() {
     if(ArtGalleryOpen){
       setTimeout(() => {
         setDelayBottomNavClose(true)
-        setDelayBottomNavClose(false)
+        setTimeout(() => {
+          setDelayBottomNavClose(false)
+        }, 1000)
         setBottomMenuReady(false)
       }, 2500)
       animate('.About', {
@@ -582,9 +603,12 @@ export default function App() {
   //it would be cool to make the subContents springs as well so we could have them bounce on the transition
   //add or remove will-change css where necessary. -- this seems to fix the mask on mobile but may have created the issue with the ellipses
   //add a back to top arrow on the bottom of about/goals
+  //https://threejs-journey.com/lessons/post-processing-with-r3f postprocessing
+  //have when resetSlowdown active lerp the colors to all red or white
+  //add a little downward slope like a message icon?
   return (
     <>
-    <div style={{ width: '100%', height: '100%'}}>
+    <div className='cDiv' style={{ width: '100%', height: '100%'}}>
     <Canvas className='menuOptions' gl={{ antialias: false }} dpr={[1, 1.5]} style={canvasStyles} camera={{ position: [0, 0, 5] }}>
     {MenuItemArray.slice(1).map((menuitem, index) => (
       <MenuCanvasText
@@ -601,13 +625,23 @@ export default function App() {
         isClickable={isMenuItemClickable}
         setHovered={setHovered}
         bIsMobile={bIsMobile}
+        hideMenuItems={hideMenuItems}
       />
     ))}
+    
+    {/* <Noise opacity={0.02} /> */}
       {!showGallery ? (
-        <Lines bIsMobile={bIsMobile} singlePoemIsActive={singlePoemIsActive} active={delay} dash={0.99} count={100} radius={1} hovered={!delay ? false : hovered} ResetSlowDown={bResetSlowDown} firstExplosionComplete={firstExplosionComplete} colors={['white', thisItem.primaryColor, thisItem.secondaryColor, thisItem.thirdColor]} />
+        <Selection enabled={true}>
+        <EffectComposer multisampling={0}>
+        <SelectiveBloom mipmapBlur radius={currentItem == 'blank' ? 0.55 : 0.9} luminanceThreshold={0.2} intensity={currentItem == 'blank' ? 3 : 0.75} />
+        </EffectComposer>
+        <Select>
+          <Lines bIsMobile={bIsMobile} singlePoemIsActive={singlePoemIsActive} active={delay} dash={bIsMobile ? 0.975 : 0.982} count={100} radius={0.95} hovered={!delay ? false : hovered} ResetSlowDown={bResetSlowDown} firstExplosionComplete={firstExplosionComplete} colors={['white','#d62828','#f77f00', '#003049']} />
+         </Select></Selection> 
       ) : null}
+      
       {loadGallery ? <Suspense fallback={null}>
-          <GalleryContent showGallery={showGallery} />
+          <GalleryContent bIsMobile={bIsMobile} showGallery={showGallery} />
         </Suspense> 
         : null}
       {/* <fog attach="fog" args={['#17171b', 0, 5]} /> */}
@@ -615,8 +649,8 @@ export default function App() {
     {bIsMobile ? null : <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} headerName={headerClassName} />}
     <div className='body' ref={scrollableContainerRef}>
         <animated.div className='bg' ref={bgColorRef} style={{ backgroundColor }}>
-          <div className={headerClassName}>
-            <h1 onClick={() => ResetWindow('textContent')}>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
+          <div onClick={() => setCurrentItem('blank')} className={headerClassName}>
+            <h1>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
             <h6>{bIsMobile ? 'MOBILE' : 'BETA'}</h6>
           </div>
           {bIsMobile ? <div className='mobileTopSection'></div> : null}
@@ -661,8 +695,8 @@ export default function App() {
           </section>
       </animated.div>
     </div>
-    {!delayBottomNavClose ? <GalleryRemakeBottom setArtGalleryOpen={setArtGalleryOpen} setCanvasZindex={setCanvasZindex} setShowGallery={setShowGallery} finishColor={thisItem.primaryColor} startColor={thisItem.secondaryColor} ready={bottomMenuReady ? true : false}/> : null}
-    {currentItem === "POEMS" ? <DOMPoems setSinglePoemIsActive={setSinglePoemIsActive} showPoemMenu={showPoemMenu} primaryColor={thisItem.thirdColor} secondaryColor={thisItem.primaryColor} setCanvasZindex={setCanvasZindex} setBCanvasPointerEvents={setBCanvasPointerEvents} /> : null}
+    {!delayBottomNavClose ? <GalleryRemakeBottom bIsMobile={bIsMobile} setArtGalleryOpen={setArtGalleryOpen} setCanvasZindex={setCanvasZindex} setShowGallery={setShowGallery} finishColor={thisItem.primaryColor} startColor={thisItem.secondaryColor} ready={bottomMenuReady ? true : false}/> : null}
+    {currentItem === "POEMS" ? <DOMPoems setHideMenuItems={setHideMenuItems} setSinglePoemIsActive={setSinglePoemIsActive} showPoemMenu={showPoemMenu} primaryColor={thisItem.thirdColor} secondaryColor={thisItem.primaryColor} setCanvasZindex={setCanvasZindex} setBCanvasPointerEvents={setBCanvasPointerEvents} bIsMobile={bIsMobile} /> : null}
     <SocialFollow />
     </>
   )
