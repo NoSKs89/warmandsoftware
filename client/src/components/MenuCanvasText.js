@@ -15,8 +15,8 @@ const Stars = {
 const RotatingCubes = (props) => {
     const groupRef = useRef();
     useFrame(() => {
-      groupRef.current.rotation.x += 0.01; // Rotate around X-axis
-      groupRef.current.rotation.y += 0.01; // Rotate around Y-axis
+      // groupRef.current.rotation.x += 0.01; // Rotate around X-axis
+      // groupRef.current.rotation.y += 0.01; // Rotate around Y-axis
       // groupRef.current.position.x = position[0]
       // groupRef.current.position.y = position[1]
       // groupRef.current.position.z = position[2]
@@ -62,14 +62,16 @@ const CanvasText = forwardRef((props, ref) => {
     useEffect(() => {
         document.body.style.cursor = hovered ? (props.isClickable ? 'pointer' : 'progress') : 'var(--cursorToUse)'
       }, [hovered, props.isClickable])
-    const handleMouseEnter = () => {
+      const handleMouseEnter = () => {
         setHovered(true)
         props.setHovered(true)
+        props.setHoverColor(props.secondaryColor)
       }
     
       const handleMouseLeave = () => {
         setHovered(false)
         props.setHovered(false)
+        props.setHoverColor('black')
       }
     
     // console.log('pos: ' + pos + '; x: ' + x + '; y: ' + y + '; hovered pos: ' + hoveredPosition)
@@ -110,9 +112,10 @@ const CanvasText = forwardRef((props, ref) => {
             rotation={rotation}
             >
             {bIsMobile && props.hideMenuItems ? '' : props.text}
-        </AnimatedText></Select>
+        </AnimatedText>
+        {/* <RotatingCubes position={pos}/> */}
+        </Select>
         </animated.group>
-        {/* <RotatingCubes position={[0,0,0]}/> */}
         </>
         )
 })

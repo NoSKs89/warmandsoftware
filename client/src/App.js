@@ -17,6 +17,7 @@ import GalleryRemakeBottom from './components/GalleryRemakeBottomDiv'
 import MenuItem from 'antd/lib/menu/MenuItem'
 import GalleryContent from './components/GalleryContent'
 import DOMPoems from './components/PoemsDOM'
+import MathLearning from './components/MathLearning'
 import GlowingCanvas from './components/EffectCompositions/GlowingCanvas'
 import { Effect } from 'postprocessing'
 
@@ -86,6 +87,7 @@ export default function App() {
   const [bUpArrowVisible, setUpArrowVisible] = useState(false)
   const [hideMenuItems, setHideMenuItems] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const [showLines, setShowLines] = useState(true)
   const [showBottomMenu, setShowBottomMenu] = useState(false) //determines whether a div that transitions to art gallery on click is visible
   const [showGallery, setShowGallery] = useState(false) //determines if we should show the art gallery
   const [loadGallery, setLoadGallery] = useState(false) //state used to prevent hiccup when art gallery loads
@@ -294,6 +296,15 @@ export default function App() {
         animate('.cDiv', {
           touchAction: 'none'
         }, { duration: 0 })
+        animate('.subContent', {
+          pointerEvents: 'all'
+        }, { duration: 0 })
+        animate('.subContent2', {
+          pointerEvents: 'all'
+        }, { duration: 0 })
+        animate('.scrollable-container', {
+          pointerEvents: 'all'
+        }, { duration: 0 })
       }
       setTimeout(() => {
         setLastItem(currentItem)
@@ -313,6 +324,15 @@ export default function App() {
       if(bIsMobile){
         animate('.cDiv', {
           touchAction: 'none'
+        }, { duration: 0 })
+        animate('.subContent', {
+          pointerEvents: 'none'
+        }, { duration: 0 })
+        animate('.subContent2', {
+          pointerEvents: 'none'
+        }, { duration: 0 })
+        animate('.scrollable-container', {
+          pointerEvents: 'none'
         }, { duration: 0 })
       }
       setFirstExplosionComplete(false)
@@ -494,8 +514,12 @@ export default function App() {
     onStart: startTransition,
   })
 
+  const [hoverColor, setHoverColor] = useState('black')
   const { backgroundColor } = useSpring({
-    backgroundColor: showGallery ? thisItem.primaryColor : thisItem.thirdColor,
+    // backgroundColor: hoverColor === 'black' ? (showGallery ? thisItem.primaryColor : thisItem.thirdColor) : hoverColor,
+    // ref: bgColorRef,
+    // config: hoverColor === 'black' ? config.molasses : config.gentle
+    backgroundColor: showLines ? (showGallery ? thisItem.primaryColor : thisItem.thirdColor) : 'grey',
     ref: bgColorRef,
     config: config.molasses
   })
@@ -589,6 +613,11 @@ export default function App() {
       }, 600)
     }
   }, [currentItem])
+
+  const mathOnClick = () => {
+    setShowLines(!showLines)
+  }
+
   //todo. 
   //find sfx library. make / record my own. recording voice noises like 'phewwwww', 'cutcha' https://theshubhagrwl.medium.com/you-might-not-need-a-sound-library-for-react-a265870dabda
   //test with hdmi toggled to ps4 (the width and height and scale is different)
@@ -597,15 +626,12 @@ export default function App() {
   //add a sphere behind the main menu items that opacity = 1 when hovering... it rotates?.. or two stars that orbit the text? Could also add to header?
   //it seems like we can click the art gallery menu div even if it's not visible.. remove click events.
   //add a cooler scroll effect
-  //I think the zindex is fading back automatically on first menu item click for lines still...
-  //create a blinking arrow or something to guide users to the end of the scroll
   //https://css-tricks.com/snippets/svg/curved-text-along-path/ curve don't stare at the sun
   //it would be cool to make the subContents springs as well so we could have them bounce on the transition
-  //add or remove will-change css where necessary. -- this seems to fix the mask on mobile but may have created the issue with the ellipses
-  //add a back to top arrow on the bottom of about/goals
   //https://threejs-journey.com/lessons/post-processing-with-r3f postprocessing
   //have when resetSlowdown active lerp the colors to all red or white
   //add a little downward slope like a message icon?
+  //make the subcontents springs and tile them in like we do for the poems.
   return (
     <>
     <div className='cDiv' style={{ width: '100%', height: '100%'}}>
@@ -616,8 +642,8 @@ export default function App() {
         key={menuitem.name}
         text={menuitem.name}
         position={menuitem.defaultPOS}
-        color={thisItem.primaryColor}
-        secondaryColor={thisItem.secondaryColor}
+        color={menuitem.primaryColor}
+        secondaryColor={menuitem.thirdColor}
         ref={menuRef}
         isClicked={menuitem.isClicked}
         currentItem={currentItem}
@@ -626,11 +652,13 @@ export default function App() {
         setHovered={setHovered}
         bIsMobile={bIsMobile}
         hideMenuItems={hideMenuItems}
+        setHoverColor={setHoverColor}
       />
     ))}
+      {!showLines ? <MathLearning /> : null}
     
     {/* <Noise opacity={0.02} /> */}
-      {!showGallery ? (
+      {!showGallery && showLines ? (
         <Selection enabled={true}>
         <EffectComposer multisampling={0}>
         <SelectiveBloom mipmapBlur radius={currentItem == 'blank' ? 0.55 : 0.9} luminanceThreshold={0.2} intensity={currentItem == 'blank' ? 3 : 0.75} />
@@ -640,9 +668,9 @@ export default function App() {
          </Select></Selection> 
       ) : null}
       
-      {loadGallery ? <Suspense fallback={null}>
-          <GalleryContent bIsMobile={bIsMobile} showGallery={showGallery} />
-        </Suspense> 
+      {loadGallery ?
+          <Suspense fallback={null}>
+          <GalleryContent bIsMobile={bIsMobile} showGallery={showGallery} /></Suspense>
         : null}
       {/* <fog attach="fog" args={['#17171b', 0, 5]} /> */}
     </Canvas></div>
@@ -651,7 +679,7 @@ export default function App() {
         <animated.div className='bg' ref={bgColorRef} style={{ backgroundColor }}>
           <div onClick={() => setCurrentItem('blank')} className={headerClassName}>
             <h1>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
-            <h6>{bIsMobile ? 'MOBILE' : 'BETA'}</h6>
+            <h6 className='mathToggle' onClick={() => mathOnClick()}>{bIsMobile ? 'MOBILE' : 'BETA'}</h6>
           </div>
           {bIsMobile ? <div className='mobileTopSection'></div> : null}
           <section className='About' style={{overflow: isAbsolute ? 'hidden !important' : 'auto'}}>
@@ -679,12 +707,12 @@ export default function App() {
                       return (
                       <React.Fragment key={index}> 
                         <div>
-                        <section className={renderImage && index > 0 && index < 2 ? 'subContent2 imgStyle' : (everyOther ? 'subContent' : 'subContent2')} onClick={textOnClick}>{renderImage && index > 0 && index < 2 ? <div className='imgContainer'><img className='aboutPhoto' src={BabeAndI} alt="BabeAndI" /></div> : null}<div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></section>
+                        <section className={renderImage && index > 0 && index < 2 ? 'subContent2 imgStyle' : (everyOther ? 'subContent sb1' : 'subContent2 sb2')} onClick={textOnClick}>{renderImage && index > 0 && index < 2 ? <div className='imgContainer'><img className='aboutPhoto' src={BabeAndI} alt="BabeAndI" /></div> : null}<div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></section>
                         <section className='readContainer'>
                         {index < MenuItemArray[MenuItemArray.findIndex(item => item.name === lastItem)].textContent.split("\\n").length - 1 && <><TimeStickingComponent initialFormattedTime={formattedTime} everyOther={everyOther} /><br /></> }</section>
                         </div>
                       </React.Fragment>
-                    ) })
+                    )})
                   )}
                   <div className='pageEnd'></div>
                   {bUpArrowVisible ? <span className='upArrow' onClick={() => ResetWindow()}>&#8593;</span> : null}

@@ -127,7 +127,7 @@ function GalleryToggle(props) {
       </div>
       <div className='horizontalText'>
         <h5>SPECIAL THANKS:</h5>
-        <p>Brooke <i> my muse and love</i><br /><br />Paul Hensch (drcmda) <i>from whom I'm learning much at distance.</i><a target="_blank" href="https://codesandbox.io/u/drcmda">....Here</a><br /> <br /></p>
+        <p>Brooke <i> my muse and love</i><br /><br />Parents and Family <i>for their endless support</i><br /><br />Paul Hensch (drcmda) <i>from whom I'm learning much at distance</i><a target="_blank" href="https://codesandbox.io/u/drcmda">....Here</a><br /> <br /></p>
       </div>
         </div>
     </div>

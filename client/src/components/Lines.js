@@ -138,8 +138,6 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
   let originalSpeed = speed
   let spiralFactor = 50
   const [zoomBack, setZoomBack] = useState(false)
-  const colorEnd = new THREE.Color('#003049')
-  const colorStart = new THREE.Color('#f77f00')
   useFrame(( { mouse }, delta) => {
     camera.updateProjectionMatrix()
     let x = (mouse.x * viewport.width) / 2
@@ -214,25 +212,36 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
       ? (setZoomBack ? MathUtils.lerp(ref.current.position.z, 0, lerpSpeed) : MathUtils.lerp(ref.current.position.z, ref.current.position.z += spiralZ * (delta / deltaMod), lerpSpeed))
       : MathUtils.lerp(ref.current.position.z, 4, lerpSpeed * 2.9)
 
+    const explosionLerpSpeed = 0.125 
     //zoom backwards during poems
     if(singlePoemIsActive){
       ref.current.position.z = MathUtils.lerp(ref.current.position.z, 0, explosionLerpSpeed * 0.25)
+      ref.current.material.dashOffset -= (delta * speed * speedMultiplier) / 8
     }
     
+    ref.current.material.color.set(lerpedColor)
+    
+    // const slowDownRound = Math.round(slowDown * 10)
+    // if(firstExplosionComplete && ResetSlowDown && slowDownRound % 2 === 0){
+    //   ref.current.material.color.set(new THREE.Color('white'))
+    // }
+    // else if(firstExplosionComplete && ResetSlowDown && slowDownRound % 3 === 0){
+    //   ref.current.material.color.set(new THREE.Color('black'))
+    // }
     //burst reset on menuItemChange
-    const explosionLerpSpeed = 0.125
     if(firstExplosionComplete){
       if(!active && ResetSlowDown){
-        ref.current.position.x = lerp(ref.current.position.x * 1.03, x, explosionLerpSpeed * 0.6)
-        ref.current.position.y = lerp(ref.current.position.y, y, explosionLerpSpeed * 1.25)
-        ref.current.position.z = lerp(ref.current.position.z, ref.current.position.z += spiralZ * (delta / deltaMod), explosionLerpSpeed)
-        ref.current.material.dashOffset -= (delta * speed * speedMultiplier) / (dashSpeed / 2)
+        ref.current.material.color.set(new THREE.Color('white'))
+        ref.current.position.x = lerp(ref.current.position.x * (!bIsMobile ? 1.03 : 1), x, explosionLerpSpeed * 0.6)
+        ref.current.position.y = lerp(ref.current.position.y * (bIsMobile ? 1.03 : 1), y, explosionLerpSpeed * 1.25)
+        ref.current.position.z = lerp(ref.current.position.z, 0, explosionLerpSpeed)
+        ref.current.material.dashOffset -= (delta * speed * speedMultiplier) / 6
       }
     }
-    ref.current.material.color.set(lerpedColor)
+    
   })
   useEffect(() => {
-    console.log('active: ' + active + '; slowdown: ' + ResetSlowDown)
+    console.log('active: ' + active + '; slowdown: ' + Math.round(slowDown * 10))
     if(active && ResetSlowDown){
       setZoomBack(true)
     }

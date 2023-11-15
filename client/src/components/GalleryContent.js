@@ -224,16 +224,15 @@ function Items({ w = 0.7, gap = 0.15, showGallery, bIsMobile }) {
   //right now scroll controls are empty because it's not in scroll... but I want it to rotate based on position
   return (
     <>
+    {showGallery ?
     <ScrollControls horizontal damping={0.5} pages={(width - xW + urls.length * xW) / width}>
-      {showGallery ?
       <Scroll>
       {urls.map((url, i) => <Item key={i} index={i} bIsMobile={bIsMobile} position={[i * xW, 0, 0]} showGallery={showGallery} scale={[w, 4, 1]} url={url} onImgClick={() => onClick(i)} />)}
-      {showGallery ?
         <AText3D artTitle={artTitle} bIsMobile={bIsMobile} />
-      : null}
       </Scroll>
-      : null}
-    </ScrollControls></>
+    </ScrollControls>
+    : null}
+    </>
   )
 }
 

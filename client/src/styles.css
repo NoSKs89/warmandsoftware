@@ -46,7 +46,7 @@
   }
   .header {
     position: absolute;
-    top: 2%; 
+    top: 2.5%; 
     left: 0;
     width: 100%;
     display: flex;
@@ -59,7 +59,7 @@
     position: fixed;
     }
   .header h1 {
-    font-size: 1rem;
+    font-size: min(1rem, 1.5vw);
     font-weight: 400;
     /* z-index: 50; */
     pointer-events: all;
@@ -211,6 +211,7 @@
       
     } */
   }
+  
   .subContent {
     background-color: gray !important;
     border-radius: 1rem;
@@ -261,7 +262,7 @@
       font-size: 1rem; 
       margin-right: 1rem;
       padding: 0.5rem;
-      padding-right: 1rem; 
+      padding-right: 1rem;
     }
     .read {
       padding: 0.45rem 0.25rem 0 0;  /* Top Right Bottom Left */
@@ -333,13 +334,13 @@
 
   .galleryToggleSun {
     position: fixed;
-    min-height: 12vh;
-    min-width: 12vh;
+    min-height: 6vw;
+    min-width: 6vw;
     z-index: 9;
     background-color: red !important;
     text-align: center;
-    top: 0vh;
-    left: 5vw;
+    top: auto;
+    left: 5%;
     border-radius: 50%;
     opacity: 1;
   }
@@ -348,6 +349,28 @@
       top: auto; 
       bottom: -1%;
       left: 15%; 
+    }
+  }
+  @media only screen and (min-width: 1989px) {
+    .galleryToggleSun {
+      margin-top: 2%;
+      min-height: 6vw;
+      min-width: 6vw;
+      top: auto; 
+      left: 5%; 
+      margin-left: 2%;
+    }
+    .header h1 {
+      font-size: min(2rem, 1.25vw);
+      padding-top: 5%;
+      padding-left: 2%;
+    }
+    .header h6 {
+      padding-top: 4%;
+      padding-right: 1%;
+    }
+    .galleryContentSun {
+      margin-top: -2.5% !important;
     }
   }
   /* Create the glow effect using box-shadow */
@@ -387,6 +410,10 @@
     margin-right: 0.4vw;
   }
  
+  .mathToggle {
+    pointer-events: all;
+    cursor: pointer;
+  }
   .horizontalText {
     min-width: 50%;
     text-align: left;
