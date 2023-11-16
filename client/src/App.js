@@ -1,5 +1,5 @@
 import React, { lazy, useState, Fragment, useEffect, useRef, useContext, memo, createContext, Suspense, useCallback, useMemo } from 'react'
-import { animate, inView } from 'motion'
+import { animate, inView, stagger } from 'motion'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { animated, SpringValue, useSpring, useChain, useTransition, useSpringRef } from "@react-spring/web"
 import { a, config, useSpring as canvasUseSpring } from '@react-spring/three'
@@ -20,6 +20,8 @@ import DOMPoems from './components/PoemsDOM'
 import MathLearning from './components/MathLearning'
 import GlowingCanvas from './components/EffectCompositions/GlowingCanvas'
 import { Effect } from 'postprocessing'
+
+const TermArray = ['BREATHE', 'RELAX', 'PAUSE']
 
 const TimeStickingComponent = ({ initialFormattedTime, everyOther }) => {
   const [stickyTime, setStickyTime] = useState(initialFormattedTime)
@@ -98,6 +100,8 @@ export default function App() {
   const [bResetSlowDown, setBResetSlowDown] = useState(false)
   const [firstExplosionComplete, setFirstExplosionComplete] = useState(false)
   const [singlePoemIsActive, setSinglePoemIsActive] = useState(false)
+  const [resetSubContentSpring, setResetSubContentSpring] = useState(false)
+  const [textContentText, setTextContentText] = useState('YO')
   const [canvasWidth, setCanvasWidth] = useState(window.innerWidth)
   const [canvasHeight, setCanvasHeight] = useState(window.innerHeight)
   const handleWindowSizeChange = () => {
@@ -247,6 +251,7 @@ export default function App() {
   const menuRef = useSpringRef()
   const bgColorRef = useSpringRef()
   const lightsRef = useRef()
+  const subContentRef = useSpringRef()
 
   //used to delay the art gallery load so it doesn't hiccup...//todo: make it NOT hiccup D:
   useEffect(() => {
@@ -287,6 +292,7 @@ export default function App() {
     if(currentItem !== 'blank'){ //if a menu item is chosen
       // console.log('currentItem: ' + currentItem)
       // textContentRef.start()
+      setResetSubContentSpring(!resetSubContentSpring)
       if(!bIsMobile){
         animate('.galleryToggleSun', {
           pointerEvents: 'none'
@@ -355,10 +361,26 @@ export default function App() {
   }, [currentItem])
   const leaveViewport = () => {}
 
-
+  //spring for the subContent & subContent2
+  const { contentPos, contentOpacity, clipPath } = useSpring({
+    ref: subContentRef,
+    config: config.molasses,
+    immediate: false,
+    pause: true,
+    reset: resetSubContentSpring,
+    loop: false,
+    // trail: 5000,
+    from: { contentPos: !bIsMobile ? 'translate3d(0,-250%,0)' : 'translate3d(0,250%,0)', contentOpacity: 0, contentColor: 'white', boxShadowSub1: "transparent", boxShadowSub2: "transparent", clipPath: 'circle(25%)'  },
+    to: { contentPos: !bIsMobile ? 'translate3d(0,0%,0)' : 'translate3d(0,0%,0)', contentOpacity: 1, contentColor: 'black', boxShadowSub1: "6px 9px 9px #000", boxShadowSub2: "-6px 9px 9px #F5F5F5", clipPath: 'circle(80%)' }
+  })
   const animationEasing = { easing: ["ease-in", "ease-out"] }
 
   const handleTransitionsComplete = () => {
+    setTextContentText('')
+    setTimeout(() => { //for reasons I don't currently understand, useChain isn't doing what I want here -- doing it this way then.
+      subContentRef.start()
+      subContentRef.resume()
+    }, 5)
     // galleryToggle
     reset() //unfortunately, this is the generic for the idle timer library. reset the timer on transition so that it waits a bit after animation
     setUpArrowVisible(false)
@@ -367,68 +389,70 @@ export default function App() {
     window.scrollTo(0, 0)
     setBResetSlowDown(false)
     let delayFirstSubcontent2 = true
-    inView('section.subContent', (info) => {
-      animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
-      animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing})
-      animate(info.target, { boxShadow: "6px 9px 9px #000" }, { duration: 4, delay: 2.5 , ...animationEasing})
-      return leaveViewport
-    }, { amount: "all", once: "true" }) 
-    inView('section.subContent2', (info) => {
-      if(delayFirstSubcontent2){
-        setTimeout(() => {
-          animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
-          animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
-          animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 4, delay: 1.5, ...animationEasing })
-          if(currentItem === 'ABOUT'){
-            animate(info.target.querySelector('img'), { opacity: 1 }, { duration: 2, delay: 2, ...animationEasing })
-            animate('.imgContainer', { opacity: 1, borderColor: 'white'}, {duration: 2, delay: 2.5, ...animationEasing })
-          }
-          delayFirstSubcontent2 = false
-          return leaveViewport  
-        }, 1500)
-      }
-      else {
-          animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
-          animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
-          animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 4, delay: 1.5, ...animationEasing })
-          animate(info.target.querySelector('img'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
-          return leaveViewport  
-      }
-    }, {  amount: "all", once: "true" })
-    inView('section.readContainer', (info) => {
-      animate(info.target.querySelector('h4'), { opacity: 1 }, { duration: 1.5, delay: Math.floor(Math.random() * 3) + 3, ...animationEasing })
-      return leaveViewport
-    }, {  amount: "all", once: "true" })
-    if((currentItem !== 'blank')){
-      inView('.pageEnd', () => { //when this invisible div is scrolled upon, toggle state to show art gallery or poem gallery.
-        // console.log("pageEnd has entered the viewport")
-        if((currentItem === 'ART') && !ArtGalleryOpen && !showGallery){
-          setShowBottomMenu(true)
-          return () => {
-            if(!showGallery && !ArtGalleryOpen && !showBottomMenu)
-              setShowBottomMenu(false) //this hides it when we scroll away -- but currently it also it is causing the onclick issue.
-          }
-        }
-        if(currentItem === 'POEMS'){
-          setShowPoemMenu(true)
-          return () => {
-            setShowPoemMenu(false)
-            setBCanvasPointerEvents(true)
-          }
-        }
-        if(currentItem === 'ABOUT' || currentItem === 'GOALS'){
+    setTimeout(() => {
+      inView('section.subContent', (info) => {
+        animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
+        animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing})
+        animate(info.target, { boxShadow: "6px 9px 9px #000" }, { duration: 2, delay: 0 , ...animationEasing})
+        return leaveViewport
+      }, { amount: "all", once: "true" }) 
+      inView('section.subContent2', (info) => {
+        if(delayFirstSubcontent2){
           setTimeout(() => {
-            setUpArrowVisible(true)
+            animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
+            animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
+            animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 2, delay: 0, ...animationEasing })
+            if(currentItem === 'ABOUT'){
+              animate(info.target.querySelector('img'), { opacity: 1 }, { duration: 2, delay: 2, ...animationEasing })
+              animate('.imgContainer', { opacity: 1, borderColor: 'white'}, {duration: 2, delay: 2.5, ...animationEasing })
+            }
+            delayFirstSubcontent2 = false
+            return leaveViewport  
           }, 1500)
-          return () => {
-            setTimeout(() => {
-              setUpArrowVisible(false)
-            }, 1000)
-          }
         }
-        return null
-      })
-    }
+        else {
+            animate(info.target.querySelector('p'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
+            animate(info.target.querySelector('i'), { opacity: 0 }, { duration: 1, delay: 0.75, ...animationEasing})
+            animate(info.target, { boxShadow: "-6px 9px 9px #F5F5F5" }, { duration: 2, delay: 0, ...animationEasing })
+            animate(info.target.querySelector('img'), { opacity: 1 }, { duration: 1, delay: 2, ...animationEasing })
+            return leaveViewport  
+        }
+      }, {  amount: "all", once: "true" })
+      inView('section.readContainer', (info) => {
+        animate(info.target.querySelector('h4'), { opacity: 1 }, { duration: 1.5, delay: Math.floor(Math.random() * 3) + 3, ...animationEasing })
+        return leaveViewport
+      }, {  amount: "all", once: "true" })
+      if((currentItem !== 'blank')){
+        inView('.pageEnd', () => { //when this invisible div is scrolled upon, toggle state to show art gallery or poem gallery.
+          // console.log("pageEnd has entered the viewport")
+          if((currentItem === 'ART') && !ArtGalleryOpen && !showGallery){
+            setShowBottomMenu(true)
+            return () => {
+              if(!showGallery && !ArtGalleryOpen && !showBottomMenu)
+                setShowBottomMenu(false) //this hides it when we scroll away -- but currently it also it is causing the onclick issue.
+            }
+          }
+          if(currentItem === 'POEMS'){
+            setShowPoemMenu(true)
+            return () => {
+              setShowPoemMenu(false)
+              setBCanvasPointerEvents(true)
+            }
+          }
+          if(currentItem === 'ABOUT' || currentItem === 'GOALS'){
+            setTimeout(() => {
+              setUpArrowVisible(true)
+            }, 1500)
+            return () => {
+              setTimeout(() => {
+                setUpArrowVisible(false)
+              }, 1000)
+            }
+          }
+          return null
+        })
+      }
+    }, 2000)
     setIsMenuItemClickable(true) //after transition, re-enable click of menu items
     setBCanvasPointerEvents(true)
   }
@@ -443,6 +467,13 @@ export default function App() {
   }, [showBottomMenu])
 
   const startTransition = () => {
+    setTimeout(() => setTextContentText(TermArray[Math.floor(Math.random() * TermArray.length)]), 500)
+    animate('.textContentText', { opacity: [0, 1], top: [ Math.random() < 0.5 ? '-100%' : '150%', '20%'] }, { duration: 2, delay: 0 }) //pointerEvents: 'none' is the problem
+    // subContentRef.reset()
+    // subContentRef.pause()
+    animate('.subContentContainer', {opacity: 0}, { duration: 0 })
+    // animate('.subContent', {opacity: 0}, { duration: 0 })
+    // animate('.subContent2', {opacity: 0}, { duration: 0 })
     reset() //unfortunately, this is the generic for the idle timer library. reset the timer on transition so that it waits a bit after animation
     animate('.galleryToggle', { opacity: [1, 0], zIndex: 0 }, { duration: 2, delay: 0 }) //pointerEvents: 'none' is the problem
     setIsAbsolute(true)
@@ -484,6 +515,7 @@ export default function App() {
     return () => clearInterval(intervalId)
   }, [currentItem])
 
+  
   //https://www.react-spring.dev/docs/advanced/events
   const contentTransitions = useTransition(currentItem, {
     ref: textContentRef,
@@ -492,19 +524,22 @@ export default function App() {
       opacity: 0,
       transform: bIsMobile ?  "translate3d(0,100%,0) scale(1)" : "translate3d(100%,0,0) scale(1)",
       backgroundColor: MenuItemArray[lastIndex].primaryColor,
-      zIndex: 3,
+      zIndex: 0,
+      animation: 'glow 2s infinite !important'
     },
     enter: {
       opacity: 1,
       transform: bIsMobile ? "translate3d(0,0%,0) scale(1)" : "translate3d(0%,0,0) scale(1)",
       backgroundColor: MenuItemArray[currentIndex].primaryColor,
       zIndex: 3, // Ensure the new content appears on top
+      animation: 'glow 2s infinite !important',
     },
     leave: {
       opacity: 0,
       transform: bIsMobile ?  "translate3d(0,100%,0) scale(1)" : "translate3d(-100%,0,0) scale(0.1)",
       backgroundColor: MenuItemArray[lastIndex].primaryColor,
       zIndex: 3, 
+      animation: 'glow 2s infinite !important',
     },
     config: bIsMobile ? config.gentle : config.molasses,
     reset: false,  
@@ -515,11 +550,12 @@ export default function App() {
   })
 
   const [hoverColor, setHoverColor] = useState('black')
-  const { backgroundColor } = useSpring({
+  const { backgroundColor, clipPathBackground } = useSpring({
     // backgroundColor: hoverColor === 'black' ? (showGallery ? thisItem.primaryColor : thisItem.thirdColor) : hoverColor,
     // ref: bgColorRef,
     // config: hoverColor === 'black' ? config.molasses : config.gentle
     backgroundColor: showLines ? (showGallery ? thisItem.primaryColor : thisItem.thirdColor) : 'grey',
+    clipPathBackground: hovered ? 'circle(1%)' : 'circle(100%)',
     ref: bgColorRef,
     config: config.molasses
   })
@@ -632,6 +668,7 @@ export default function App() {
   //have when resetSlowdown active lerp the colors to all red or white
   //add a little downward slope like a message icon?
   //make the subcontents springs and tile them in like we do for the poems.
+  //hide scrollable container on click?
   return (
     <>
     <div className='cDiv' style={{ width: '100%', height: '100%'}}>
@@ -676,6 +713,7 @@ export default function App() {
     </Canvas></div>
     {bIsMobile ? null : <SunMenu finishColor={thisItem.secondaryColor} ready={currentIndex === 0 ? true : false} headerName={headerClassName} />}
     <div className='body' ref={scrollableContainerRef}>
+    {/* <animated.div className='bgClip' style={{ width: '100%', height: '100%', clipPath: clipPathBackground }}></animated.div> */}
         <animated.div className='bg' ref={bgColorRef} style={{ backgroundColor }}>
           <div onClick={() => setCurrentItem('blank')} className={headerClassName}>
             <h1>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
@@ -689,8 +727,9 @@ export default function App() {
                 <animated.div
                   className='textContent'
                   ref={textContentRef}
-                  style={{ ...style, position: isAbsolute ? 'absolute' : 'relative', top: 0, left: 0 }}
+                  style={{ ...style, position: isAbsolute ? 'absolute' : 'relative', top: 0, left: 0, clipPath: clipPath }}
                 >
+                  <div className='textContentText'>{!bIsMobile ? textContentText : ''}</div>
                   {(
                     //we create a new div for each time the text hits an \\n 
                     //every other has different css
@@ -706,11 +745,11 @@ export default function App() {
                       }
                       return (
                       <React.Fragment key={index}> 
-                        <div>
-                        <section className={renderImage && index > 0 && index < 2 ? 'subContent2 imgStyle' : (everyOther ? 'subContent sb1' : 'subContent2 sb2')} onClick={textOnClick}>{renderImage && index > 0 && index < 2 ? <div className='imgContainer'><img className='aboutPhoto' src={BabeAndI} alt="BabeAndI" /></div> : null}<div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></section>
+                        <animated.div className='subContentContainer' key={resetSubContentSpring} ref={subContentRef} style={{transform: contentPos, opacity: contentOpacity}}>
+                        <animated.section className={renderImage && index > 0 && index < 2 ? 'subContent2 imgStyle' : (everyOther ? 'subContent sb1' : 'subContent2 sb2')} onClick={textOnClick}>{renderImage && index > 0 && index < 2 ? <div className='imgContainer'><img className='aboutPhoto' src={BabeAndI} alt="BabeAndI" /></div> : null}<div className='centered'><p className='hidden'>{line.split('--').join(String.fromCharCode(8211)) }</p><i><div className='ellipsesContainer'><Ellipses /></div></i></div></animated.section>
                         <section className='readContainer'>
                         {index < MenuItemArray[MenuItemArray.findIndex(item => item.name === lastItem)].textContent.split("\\n").length - 1 && <><TimeStickingComponent initialFormattedTime={formattedTime} everyOther={everyOther} /><br /></> }</section>
-                        </div>
+                        </animated.div>
                       </React.Fragment>
                     )})
                   )}

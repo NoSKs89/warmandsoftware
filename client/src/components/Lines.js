@@ -51,7 +51,7 @@ function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, single
   const [minZ, setMinZ] = useState(100)
   const [maxZ, setMaxZ] = useState(-100)
   useEffect(() => {
-    console.log('minZ: ' + minZ + '; maxZ: ' + maxZ)
+    // console.log('minZ: ' + minZ + '; maxZ: ' + maxZ)
   }, [minZ, maxZ])
   const lines = useMemo(() => {
     return Array.from({ length: count }, (_, index) => {
@@ -241,7 +241,7 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
     
   })
   useEffect(() => {
-    console.log('active: ' + active + '; slowdown: ' + Math.round(slowDown * 10))
+    // console.log('active: ' + active + '; slowdown: ' + Math.round(slowDown * 10))
     if(active && ResetSlowDown){
       setZoomBack(true)
     }

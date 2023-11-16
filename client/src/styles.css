@@ -117,7 +117,15 @@
     background-color: #49a1eb;
     /* overflow:auto; */
     min-height: calc(100vh);
-
+  }
+  .bgClip {
+    background-color: grey;
+    opacity: 1;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
   }
 
   img { 
@@ -179,6 +187,20 @@
       mask: var(--mask);
       scroll-behavior: smooth !important;
       will-change: transform, opacity, background-color, z-index;
+      /* transition: clip-path 4s;
+      clip-path: circle(75%); */
+      animation: none;
+  }
+  .textContentText {
+    text-align: center;
+    position: fixed;
+    left: 20%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    font-size: 25vh;
+    font-family: var(--secondFontFamily);
+    z-index: 2;
+    animation: blackGlowText 4s infinite;
   }
   @media only screen and (max-width: 768px) {
     .textContent {
@@ -210,6 +232,10 @@
             mask: var(--mask);
       
     } */
+  }
+  .subContentContainer{
+    opacity: 0;
+    transform: translate3d(0,-250%,0);
   }
   
   .subContent {
