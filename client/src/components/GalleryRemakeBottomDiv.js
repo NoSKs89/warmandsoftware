@@ -64,7 +64,7 @@ function GalleryToggle(props) {
       setHoverable(false) //remove the ability to hover
       doOpenAnimation()
       setTimeout(() => {
-        props.setCanvasZindex('13') //bring the canvas in front of the html body after a short delay
+        props.setCanvasZindex(13) //bring the canvas in front of the html body after a short delay
         props.setShowGallery(true) //tell app.js to enable the art gallery after a short delay
       }, 850)
       animate('.menuOptions', { //fade the canvas from 0 to 1 -- is this necessary?

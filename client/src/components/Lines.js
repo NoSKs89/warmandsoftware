@@ -45,7 +45,7 @@ const lerpColors = (colors, t) => {
 // speed: The speed at which the line travels, a random value.
 // curve: An array of coordinates that make up the path of the line. This array is flattened, meaning that the coordinates are stored as a flat sequence of numbers.
 
-function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, singlePoemIsActive, firstExplosionComplete, hovered, rand = THREE.MathUtils.randFloatSpread, bIsMobile }) {
+function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, singlePoemIsActive, firstExplosionComplete, hovered, rand = THREE.MathUtils.randFloatSpread, bIsMobile, setX, setY, setLineSpeed }) {
   let radiusFactor = 0.025
   //use memo gleeks out when I try to add the colors to it.
   const [minZ, setMinZ] = useState(100)
@@ -73,7 +73,7 @@ function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, single
     }, [colors])
   }, [count, radius]) //removing colors stops the re-render but then won't change color
 
-  return lines.map((props, index) => <Fatline key={index} minZ={minZ} setMinZ={setMinZ} maxZ={maxZ} setMaxZ={setMaxZ} dash={dash} delay={props.delay} active={active} {...props} singlePoemIsActive={singlePoemIsActive} hovered={hovered} ResetSlowDown={ResetSlowDown} firstExplosionComplete={firstExplosionComplete} />)
+  return lines.map((props, index) => <Fatline key={index} minZ={minZ} setMinZ={setMinZ} maxZ={maxZ} setMaxZ={setMaxZ} dash={dash} delay={props.delay} active={active} {...props} singlePoemIsActive={singlePoemIsActive} hovered={hovered} ResetSlowDown={ResetSlowDown} firstExplosionComplete={firstExplosionComplete} setX={setX} setY={setY} setLineSpeed={setLineSpeed} />)
 }
 
 const calculateColorInterpolation = (index, max) => {
@@ -129,7 +129,7 @@ const AdjustSpeedAndSpiral = (max, index, lerpSpeed, spiralX, spiralY, spiralZ, 
   return {lerpSpeed, spiralX, spiralY, spiralZ, dashSpeed, lerpedColor }
 }
 
-function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowDown, firstExplosionComplete, singlePoemIsActive, delay, bIsMobile, c = new THREE.Color(), minZ, maxZ, setMinZ, setMaxZ }) {
+function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowDown, firstExplosionComplete, singlePoemIsActive, delay, bIsMobile, c = new THREE.Color(), minZ, maxZ, setMinZ, setMaxZ, setX, setY, setLineSpeed }) {
   const { viewport, camera } = useThree()
   width = !hovered && !active ? width : width * 2
   const ref = useRef()
@@ -238,7 +238,13 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
         ref.current.material.dashOffset -= (delta * speed * speedMultiplier) / 6
       }
     }
-    
+
+    //these are intensive. only do it on the first index
+    if(delay === 0){
+      setX(ref.current.position.x)
+      setY(ref.current.position.y)
+      // setLineSpeed(speed)
+    }
   })
   useEffect(() => {
     // console.log('active: ' + active + '; slowdown: ' + Math.round(slowDown * 10))

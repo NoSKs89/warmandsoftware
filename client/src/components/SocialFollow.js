@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faVolumeHigh, faVolumeXmark } from '@fortawesome/free-solid-svg-icons';
 import {
     faYoutube,
     faFacebook,
@@ -9,7 +10,8 @@ import {
     faLinkedin
   } from "@fortawesome/free-brands-svg-icons";
   
-export default function SocialFollow() {
+
+const SocialFollow = ({muted, setMuted}) => {
   return (
     <div className="social-container">
       <a href="https:///www.linkedin.com/in/stephenmerickson"
@@ -31,8 +33,13 @@ export default function SocialFollow() {
         className="instagram social" target="_blank">
         <FontAwesomeIcon icon={faInstagram} size="1x"/>
       </a>
+      <a className="speaker social" onClick={() => setMuted(!muted)}>
+        {!muted ? <FontAwesomeIcon icon={faVolumeHigh} size="1x" /> : <FontAwesomeIcon className="red" icon={faVolumeXmark} size="1x" /> }
+        </a>
     </div>
     //SUBSTACK.COM/@WARMANDSOFT
     //www.linkedin.com/in/stephenmerickson
   );
 }
+
+export default SocialFollow

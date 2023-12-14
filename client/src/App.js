@@ -21,7 +21,19 @@ import MathLearning from './components/MathLearning'
 import GlowingCanvas from './components/EffectCompositions/GlowingCanvas'
 import { Effect } from 'postprocessing'
 
-const TermArray = ['BREATHE', 'RELAX', 'PAUSE']
+import useSound, { fade, stereo } from 'use-sound'
+import rootDrone16Bars from '../src/sfx/RootD16Bars.wav'
+import IntervalB from '../src/sfx/IntervalB.wav'
+import IntervalD from '../src/sfx/IntervalD.wav'
+import IntervalA from '../src/sfx/IntervalA.wav'
+import IntervalG from '../src/sfx/IntervalG2.wav'
+import AClick from '../src/sfx/AClick1.wav'
+import BClick from '../src/sfx/BClick1.wav'
+import DClick from '../src/sfx/DClick1.wav'
+import GClick from '../src/sfx/GClick1.wav'
+import Flutter1 from '../src/sfx/Wind1Normal.wav'
+
+const TermArray = ['BREATHE', 'RELAX', 'PAUSE', 'UNWIND', 'RELEASE', 'REFLECT', 'FLOW', 'SOFTEN', 'SOOTHE', 'RESTORE', 'REST', 'RENEW']
 
 const TimeStickingComponent = ({ initialFormattedTime, everyOther }) => {
   const [stickyTime, setStickyTime] = useState(initialFormattedTime)
@@ -72,7 +84,7 @@ const MenuItemArray = [
 
 export default function App() {
   //states
-  const [canvasZindex, setCanvasZindex] = useState('0')
+  const [canvasZindex, setCanvasZindex] = useState(0)
   const [bCanvasPointerEvents, setBCanvasPointerEvents] = useState(true)
   const [currentItem, setCurrentItem] = useState('blank') //handle main menu state
   const [lastItem, setLastItem] = useState('blank')//handle main menu state
@@ -115,11 +127,181 @@ export default function App() {
           }
   }, [])
   const pixelRatio = Math.ceil(window.devicePixelRatio)
-  const bIsMobile = (canvasWidth <= 768) || (canvasHeight >= 1300) || (pixelRatio > 1 && canvasWidth <= 1000) 
+  let bIsMobile = (canvasWidth <= 768) || (canvasHeight >= 1300) || (pixelRatio > 1 && canvasWidth <= 1000) 
+  const [isPortrait, setIsPortrait] = useState(bIsMobile)
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(
+      'only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)'
+    )
+    // Update the state based on the initial match
+    setIsPortrait(mediaQuery.matches)
+    // Add a listener to update the state when the match changes
+    const handleChange = (event) => {
+      setIsPortrait(event.matches)
+    }
+    mediaQuery.addListener(handleChange)
+    // Clean up the listener when the component is unmounted
+    return () => {
+      mediaQuery.removeListener(handleChange)
+    }
+  }, [])
   const [headerClassName, setHeaderClassName] = useState(!bIsMobile ? 'header' : 'headerMobile')
   useEffect(() => {
+    if(isPortrait){
+      bIsMobile = true
+    }
+    console.log('isPortrait: ' + isPortrait + '; isMobile: ' + bIsMobile)
     setHeaderClassName(bIsMobile ? 'headerMobile' : 'header')
-  }, [bIsMobile])
+  }, [bIsMobile, isPortrait])
+  const[x, setX] = useState(0)
+  const[y, setY] = useState(0)
+  const[lineSpeed, setLineSpeed] = useState(0)
+  const[flutterPan, setFlutterPan] = useState(0)
+  const [muted, setMuted] = useState(false)
+  const [playRootDrone, { stopRootDrone, sound: soundRootDrone }] = useSound(rootDrone16Bars, {
+    interrupt: true,
+    loop: true,
+    autoplay: true,
+    stereo: flutterPan / 4,
+    soundEnabled: muted,
+    volume: 1
+  })
+  const [playFlutter, { stopFlutter, sound: FlutterSound }] = useSound(Flutter1, {
+    interrupt: true,
+    loop: true,
+    autoplay: false,
+    stereo: flutterPan,
+    soundEnabled: muted
+  })
+  useEffect(() => { 
+    // console.log('x: ' + x + '; y: ' + y)
+    console.log('lineSpeed: ' + lineSpeed)
+    //the first index of ref.current.position.x will determine the pan
+    setFlutterPan(x / 8)
+    // console.log('flutterPan: ' + flutterPan)
+    if(FlutterSound)
+      FlutterSound.stereo(flutterPan)
+    if(soundRootDrone)
+      soundRootDrone.stereo(flutterPan / 2)
+  }, [x, y])
+  const [playIntervalB, { stop: stopIntervalB, sound: fadeB }] = useSound(IntervalB, {
+    interrupt: true,
+    loop: true,
+    autoplay: false,
+    soundEnabled: muted
+  })
+  const [playIntervalA, { stop: stopIntervalA, sound: fadeA }] = useSound(IntervalA, {
+    interrupt: true,
+    loop: true,
+    autoplay: false,
+    soundEnabled: muted
+  })
+  const [playIntervalG, { stop: stopIntervalG, sound: fadeG }] = useSound(IntervalG, {
+    interrupt: true,
+    loop: true,
+    autoplay: false,
+    soundEnabled: muted
+  })
+  const [playIntervalD, { stop: stopIntervalD, sound: fadeD }] = useSound(IntervalD, {
+    interrupt: true,
+    loop: true,
+    autoplay: false,
+    soundEnabled: muted
+  })
+  const [playAClick, { stop: stopAClick, sound: AClickSound }] = useSound(AClick, {
+    interrupt: true,
+    loop: false,
+    autoplay: false,
+    stereo: (0.95),
+    soundEnabled: muted
+  })
+  const [playBClick, { stop: stopBClick, sound: BClickSound }] = useSound(BClick, {
+    interrupt: true,
+    loop: false,
+    autoplay: false,
+    stereo: (0.95),
+    soundEnabled: muted
+  })
+  const [playDClick, { stop: stopDClick, sound: DClickSound }] = useSound(DClick, {
+    interrupt: true,
+    loop: false,
+    autoplay: false,
+    stereo: (0.95),
+    soundEnabled: muted
+  })
+  const [playGClick, { stop: stopGClick, sound: GClickSound }] = useSound(GClick, {
+    interrupt: true,
+    loop: false,
+    autoplay: false,
+    stereo: (0.95),
+    soundEnabled: muted
+  })
+  useEffect(() => {
+    if(muted){
+      if(soundRootDrone)
+        soundRootDrone.volume(0)
+      if(FlutterSound)
+        FlutterSound.volume(0)
+      if(fadeA)
+        fadeA.volume(0)
+      if(fadeB)
+        fadeB.volume(0)
+      if(fadeD)
+        fadeD.volume(0)
+      if(fadeG)
+        fadeG.volume(0)
+      if(AClickSound)
+        AClickSound.volume(0)
+      if(BClickSound)
+        BClickSound.volume(0)
+      if(DClickSound)
+        DClickSound.volume(0)
+      if(GClickSound)
+        GClickSound.volume(0)
+      }
+      else{
+        if(soundRootDrone)
+          soundRootDrone.volume(1)
+        if(FlutterSound)
+          FlutterSound.volume(1)
+        if(fadeA)
+          fadeA.volume(1)
+        if(fadeB)
+          fadeB.volume(1)
+        if(fadeD)
+          fadeD.volume(1)
+        if(fadeG)
+          fadeG.volume(1)
+        if(AClickSound)
+          AClickSound.volume(1)
+        if(BClickSound)
+          BClickSound.volume(1)
+        if(DClickSound)
+          DClickSound.volume(1)
+        if(GClickSound)
+          GClickSound.volume(1)
+      }
+  }, [muted])
+  const stopIntervals = () => {
+    if(fadeA)
+      fadeA.fade(1, 0, 1000)
+    if(fadeD)
+      fadeD.fade(1, 0, 1000)
+    if(fadeB)
+      fadeB.fade(1, 0, 1000)
+    if(fadeG)
+      fadeG.fade(1, 0, 1000)
+    setTimeout(() => {
+      stopIntervalB()
+      stopIntervalA()
+      stopIntervalG()
+      stopIntervalD()
+    }, [1002])
+  }
+  useEffect(() => {
+    playRootDrone()
+    // playFlutter()
+  }, [])
   // console.log('isMobile: ' + bIsMobile)
   //intro load animations
   useEffect(() => {
@@ -205,6 +387,7 @@ export default function App() {
   useEffect(() => {
     if(bIsMobile){
       if(currentItem === 'blank'){
+
       }
       else{
         if(idle){
@@ -277,8 +460,6 @@ export default function App() {
       })
     }
     else{
-      if(bIsMobile)
-         alert('resetting window for class: ' + className)
       const targetDiv = document.getElementById(className)
       const targetDivPosition = targetDiv.getBoundingClientRect().top + window.scrollY
       window.scrollTo({
@@ -292,6 +473,37 @@ export default function App() {
     if(currentItem !== 'blank'){ //if a menu item is chosen
       // console.log('currentItem: ' + currentItem)
       // textContentRef.start()
+      stopIntervals()
+      //immediate menu item
+      if(currentItem === 'ABOUT')
+        playAClick()
+      else if(currentItem === 'ART')
+        playGClick()
+      else if(currentItem === 'POEMS')
+        playBClick()
+      else if(currentItem === 'GOLAS')
+        playDClick()
+      //slowly fade ambient
+      setTimeout(() => {
+        if(soundRootDrone)
+          soundRootDrone.fade(1, 0.5, 500)
+        if(currentItem === 'ABOUT'){
+          playIntervalA()
+          fadeA.fade(0, 1, 550)
+        }
+        else if(currentItem === 'ART'){
+          playIntervalG()
+          fadeG.fade(0, 1, 550)
+        }
+        else if(currentItem === 'POEMS'){
+          playIntervalB()
+          fadeB.fade(0, 1, 550)
+        }
+        else if(currentItem === 'GOALS'){
+          playIntervalD()
+          fadeD.fade(0, 1, 550) 
+        }
+      }, 1010)
       setResetSubContentSpring(!resetSubContentSpring)
       if(!bIsMobile){
         animate('.galleryToggleSun', {
@@ -322,6 +534,9 @@ export default function App() {
       }
     }
     else { //if no main menu item selected
+      stopIntervals()
+      if(soundRootDrone)
+        soundRootDrone.fade(0.5, 1, 500)
       if(!bIsMobile){
         animate('.galleryToggleSun', {
           pointerEvents: 'all'
@@ -357,7 +572,7 @@ export default function App() {
         opacity: [1]
       }, { duration: 0 })
     }
-    setCanvasZindex('0')
+    setCanvasZindex(0)
   }, [currentItem])
   const leaveViewport = () => {}
 
@@ -468,7 +683,7 @@ export default function App() {
 
   const startTransition = () => {
     setTimeout(() => setTextContentText(TermArray[Math.floor(Math.random() * TermArray.length)]), 500)
-    animate('.textContentText', { opacity: [0, 1], top: [ Math.random() < 0.5 ? '-100%' : '150%', '20%'] }, { duration: 2, delay: 0 }) //pointerEvents: 'none' is the problem
+    animate('.textContentText', { opacity: [0, 1], top: [ Math.random() < 0.5 ? '-100%' : '100%', '15%'] }, { duration: isPortrait ? 2 : 2, delay: 0 }) //pointerEvents: 'none' is the problem
     // subContentRef.reset()
     // subContentRef.pause()
     animate('.subContentContainer', {opacity: 0}, { duration: 0 })
@@ -541,7 +756,7 @@ export default function App() {
       zIndex: 3, 
       animation: 'glow 2s infinite !important',
     },
-    config: bIsMobile ? config.gentle : config.molasses,
+    config: isPortrait || !bIsMobile ? config.molasses : config.gentle,
     reset: false,  
     exitBeforeEnter: false,
     immediate: false,
@@ -651,7 +866,8 @@ export default function App() {
   }, [currentItem])
 
   const mathOnClick = () => {
-    setShowLines(!showLines)
+    if(!bIsMobile)
+      setShowLines(!showLines)
   }
 
   //todo. 
@@ -669,6 +885,9 @@ export default function App() {
   //add a little downward slope like a message icon?
   //make the subcontents springs and tile them in like we do for the poems.
   //hide scrollable container on click?
+  //decrease scrollable-container / textContent on wide imac
+  //further make sure that the divs don't load in out of order?
+  
   return (
     <>
     <div className='cDiv' style={{ width: '100%', height: '100%'}}>
@@ -701,7 +920,7 @@ export default function App() {
         <SelectiveBloom mipmapBlur radius={currentItem == 'blank' ? 0.55 : 0.9} luminanceThreshold={0.2} intensity={currentItem == 'blank' ? 3 : 0.75} />
         </EffectComposer>
         <Select>
-          <Lines bIsMobile={bIsMobile} singlePoemIsActive={singlePoemIsActive} active={delay} dash={bIsMobile ? 0.975 : 0.982} count={100} radius={0.95} hovered={!delay ? false : hovered} ResetSlowDown={bResetSlowDown} firstExplosionComplete={firstExplosionComplete} colors={['white','#d62828','#f77f00', '#003049']} />
+          <Lines bIsMobile={bIsMobile} setX={setX} setY={setY} setLineSpeed={setLineSpeed} singlePoemIsActive={singlePoemIsActive} active={delay} dash={bIsMobile ? 0.975 : 0.982} count={100} radius={0.95} hovered={!delay ? false : hovered} ResetSlowDown={bResetSlowDown} firstExplosionComplete={firstExplosionComplete} colors={['white','#d62828','#f77f00', '#003049']} />
          </Select></Selection> 
       ) : null}
       
@@ -717,7 +936,7 @@ export default function App() {
         <animated.div className='bg' ref={bgColorRef} style={{ backgroundColor }}>
           <div onClick={() => setCurrentItem('blank')} className={headerClassName}>
             <h1>WARM+SOFTWARE</h1><h5>by Stephen Erickson</h5>
-            <h6 className='mathToggle' onClick={() => mathOnClick()}>{bIsMobile ? 'MOBILE' : 'BETA'}</h6>
+            <h6 className='mathToggle' onClick={() => mathOnClick()}>{isPortrait ? 'TABLET' : (bIsMobile ? 'MOBILE' : 'BETA')}</h6>
           </div>
           {bIsMobile ? <div className='mobileTopSection'></div> : null}
           <section className='About' style={{overflow: isAbsolute ? 'hidden !important' : 'auto'}}>
@@ -729,7 +948,7 @@ export default function App() {
                   ref={textContentRef}
                   style={{ ...style, position: isAbsolute ? 'absolute' : 'relative', top: 0, left: 0, clipPath: clipPath }}
                 >
-                  <div className='textContentText'>{!bIsMobile ? textContentText : ''}</div>
+                  <div className='textContentText'>{!bIsMobile || isPortrait ? textContentText : ''}</div>
                   {(
                     //we create a new div for each time the text hits an \\n 
                     //every other has different css
@@ -764,7 +983,7 @@ export default function App() {
     </div>
     {!delayBottomNavClose ? <GalleryRemakeBottom bIsMobile={bIsMobile} setArtGalleryOpen={setArtGalleryOpen} setCanvasZindex={setCanvasZindex} setShowGallery={setShowGallery} finishColor={thisItem.primaryColor} startColor={thisItem.secondaryColor} ready={bottomMenuReady ? true : false}/> : null}
     {currentItem === "POEMS" ? <DOMPoems setHideMenuItems={setHideMenuItems} setSinglePoemIsActive={setSinglePoemIsActive} showPoemMenu={showPoemMenu} primaryColor={thisItem.thirdColor} secondaryColor={thisItem.primaryColor} setCanvasZindex={setCanvasZindex} setBCanvasPointerEvents={setBCanvasPointerEvents} bIsMobile={bIsMobile} /> : null}
-    <SocialFollow />
+    <SocialFollow muted={muted} setMuted={() => setMuted(!muted)} />
     </>
   )
 }
