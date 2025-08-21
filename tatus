@@ -1,0 +1,10 @@
+[33m27a2fd7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m first addition of sound
+[33m97ac93c[m convert subcontents to spring and clippath
+[33m5f2895a[m starting geometry testing.
+[33m41b74bd[m update package, make lines reactive and add effect
+[33mf0f478c[m lots of mobile changes and added a jump to toparro
+[33md0fa52b[m many mobile changes
+[33m1b5c30d[m limit cursor from moving ref too far left
+[33m952ab4a[m changed gallery and added photo
+[33mc561b9f[m changes to get ellipses centered
+[33m9d4a925[m finished gallery for now

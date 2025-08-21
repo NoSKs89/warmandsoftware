@@ -1,8 +1,7 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Text, Billboard } from "@react-three/drei"
+import { useFrame, useThree } from '@react-three/fiber'
+import { Text } from "@react-three/drei"
 import { useEffect, useState, forwardRef, useRef } from 'react'
-import { animated, SpringValue, useSpring, config } from '@react-spring/three'
-import * as THREE from 'three'
+import { animated, useSpring } from '@react-spring/three'
 import Box from '../components/Box'
 import { Select } from '@react-three/postprocessing'
 
@@ -65,16 +64,14 @@ const CanvasText = forwardRef((props, ref) => {
       const handleMouseEnter = () => {
         setHovered(true)
         props.setHovered(true)
-        props.setHoverColor(props.secondaryColor)
       }
     
       const handleMouseLeave = () => {
         setHovered(false)
         props.setHovered(false)
-        props.setHoverColor('black')
       }
     
-    // console.log('pos: ' + pos + '; x: ' + x + '; y: ' + y + '; hovered pos: ' + hoveredPosition)
+
     const posOffScren = bIsMobile ? [0, 5, 0] : [11, 0, 0]
     const { color, fontSize, position, secondaryColor, strokeWidth } = useSpring({
         color: props.isClickable ? (props.currentItem === props.text || !hovered ? 'white' : 'grey') : props.color,
@@ -82,10 +79,9 @@ const CanvasText = forwardRef((props, ref) => {
         strokeWidth: props.isClickable ? ('0.5%') : '2%',
         fontSize: props.isClickable ? 0.3 : 0.5,
         position:  props.currentItem === props.text ? hoveredPosition : (props.isClickable ? pos : posOffScren),
-        config:  { mass: 5, tension: 1000, friction: 50, precision: 0.0001}  //props.isClickable ? { mass: 5, tension: 1000, friction: 50, precision: 0.0001} : config.stiff
+        config:  { mass: 5, tension: 1000, friction: 50, precision: 0.0001}
     })
     const { rotation } = useSpring({
-        // rotation: props.isClickable ? [25,0,45] : [25,0,44], // for some reason this like spins around a bunch...
         rotation: !bIsMobile ? [25,0,45] : (props.currentItem === props.text ? [25, 0, 44] : [25, 0, 45])
     })
     return (
@@ -113,7 +109,6 @@ const CanvasText = forwardRef((props, ref) => {
             >
             {bIsMobile && props.hideMenuItems ? '' : props.text}
         </AnimatedText>
-        {/* <RotatingCubes position={pos}/> */}
         </Select>
         </animated.group>
         </>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { animate, inView } from 'motion'
+import { animate } from 'motion'
 
 import GalleryContent from '../components/GalleryContent'
 

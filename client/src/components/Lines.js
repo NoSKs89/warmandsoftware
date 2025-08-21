@@ -3,8 +3,6 @@ import { useMemo, useRef, useState, useEffect, ReactNode, Suspense } from 'react
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
 import { extend, Canvas, useFrame, useThree } from '@react-three/fiber'
 import { MathUtils } from 'three'
-import { act } from 'react-dom/test-utils'
-import { Selection, Select, EffectComposer, Bloom, Noise, Vignette, SelectiveBloom } from '@react-three/postprocessing'
 
 extend({ MeshLineGeometry, MeshLineMaterial })
 
@@ -51,7 +49,7 @@ function Lines({ dash, active, count, colors, radius = 50, ResetSlowDown, single
   const [minZ, setMinZ] = useState(100)
   const [maxZ, setMaxZ] = useState(-100)
   useEffect(() => {
-    // console.log('minZ: ' + minZ + '; maxZ: ' + maxZ)
+    // Track minZ and maxZ changes
   }, [minZ, maxZ])
   const lines = useMemo(() => {
     return Array.from({ length: count }, (_, index) => {
@@ -145,7 +143,7 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
     const distanceFromCenter = Math.sqrt(x * x + y * y)
     const lerpThresholdMax = 0.95 * Math.min(viewport.width, viewport.height) // if off screen l/r
     const lerpThresholdMin = 0.4 * Math.min(viewport.width, viewport.height)
-
+    const distanceFromMouse = Math.abs(ref.current.position.x - x);
     //slow down after the burst so it's not as distracting behind the content.
     if(!active && slowDown > 300){
       setSlowDown(speed / 4)
@@ -239,15 +237,14 @@ function Fatline({ curve, width, color, speed, dash, active, hovered, ResetSlowD
       }
     }
 
-    //these are intensive. only do it on the first index
-    if(delay === 0){
+    //these are intensive. don't set each index. however, a few at a time seems to make panning more responsive.
+    if([1, 15, 30, 60].includes(delay) && !singlePoemIsActive){
       setX(ref.current.position.x)
       setY(ref.current.position.y)
-      // setLineSpeed(speed)
+      setLineSpeed(distanceFromMouse)
     }
   })
   useEffect(() => {
-    // console.log('active: ' + active + '; slowdown: ' + Math.round(slowDown * 10))
     if(active && ResetSlowDown){
       setZoomBack(true)
     }

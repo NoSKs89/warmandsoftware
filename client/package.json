@@ -32,6 +32,7 @@
     "motion": "^10.16.4",
     "nice-color-palettes": "^2.0.0",
     "oridomi": "^1.1.2",
+    "p5": "^1.9.0",
     "pixijs": "^7.1.4",
     "postprocessing": "^6.28.7",
     "react": "^18.2.0",
